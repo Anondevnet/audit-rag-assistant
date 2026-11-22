@@ -26,6 +26,8 @@ Regenerate the CLI GIF locally with `python scripts/record_demo.py` after `audit
 
 **After** is [`evals/reports/latest.json`](evals/reports/latest.json) / [`evals/reports/hashing-token.json`](evals/reports/hashing-token.json): the same hashing + token + extractive CI stack, after (1) merging short heading-only sections so 5-token title stubs no longer dominate BM25, (2) query expansion (SWC title lookup, hyphen variants, a small synonym list — not gold-answer look-up), and (3) a length-floored token reranker with a mild section prior. The corpus now has **345** chunks. Golden `chunk_id`s were rematched to the passages that still contain the same source key points (description/remediation/mitigation), not by picking whatever the retriever returned.
 
+Extractive answers now strip markdown headings, link syntax, and bullets; skip Relationships/reference-list boilerplate and title-only sentences; and prefer Description/Remediation sentences. After rerunning the harness on this change, Recall@5/10, MRR, citation accuracy (1.0), faithfulness (1.0), and refusal accuracy (1.0) are unchanged from the table below.
+
 Static dashboard: [`evals/reports/dashboard.html`](evals/reports/dashboard.html).
 
 | Metric | Before (M2) | After (hashing + token) |

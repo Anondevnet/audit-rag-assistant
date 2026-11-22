@@ -173,7 +173,7 @@ button.primary:disabled { opacity: 0.65; cursor: wait; }
   margin: 0 0 0.45rem;
 }
 .answer-card.refuse .answer-kicker { color: var(--danger); }
-.answer-body { font-size: 1.02rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.answer-body { font-size: 1.02rem; overflow-wrap: anywhere; }
 .cite-chip {
   display: inline-flex;
   align-items: baseline;

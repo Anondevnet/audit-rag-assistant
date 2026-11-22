@@ -137,47 +137,259 @@ def evidence_is_insufficient(query: str, hits: list[SearchHit], answer_text: str
     return None
 
 
-def _sentences(text: str) -> list[str]:
+_CONTENT_SECTIONS = ("description", "remediation", "mitigation", "attack", "vulnerability")
+_LOW_SECTIONS = (
+    "relationships", "references", "source notice", "samples", "example files",
+)
+_HEADING_ONLY = {
+    "description", "remediation", "mitigation", "mitigations", "references",
+    "relationships", "samples", "examples", "source notice", "attack",
+    "attack scenario", "attack scenarios",
+}
+
+
+def clean_markdown(text: str) -> str:
+    """Strip markdown markup so extractive sentences read as prose."""
     text = re.sub(r"```.*?```", " ", text, flags=re.S)
-    # keep markdown headings from becoming empty
+    previous = None
+    while previous != text:
+        previous = text
+        text = re.sub(r"!\[([^\]]*)\]\([^)]*\)", r"\1", text)
+        text = re.sub(r"\[([^\[\]]+)\]\([^)]*\)", r"\1", text)
+    text = re.sub(r"`([^`]+)`", r"\1", text)
+    text = re.sub(r"(\*\*|__)(.*?)\1", r"\2", text)
+    text = re.sub(r"(?<!\w)_(?!\s)(.+?)(?<!\s)_(?!\w)", r"\1", text)
+    # Headings become breaks even when a prior section is glued mid-line in a chunk.
+    text = re.sub(r"(^|\n)\s*#{1,6}\s+", r"\1", text)
+    text = re.sub(r"\s+#{1,6}\s+", "\n", text)
+    text = re.sub(
+        r"(^|\n)\s*(Description|Remediation|Mitigations?|References|Relationships|Samples|Examples|Source Notice|Attack Scenarios?|Attack)\s+",
+        r"\1",
+        text,
+        flags=re.I,
+    )
+    text = re.sub(r"^\s*[-*+]\s+", "", text, flags=re.M)
+    text = re.sub(r"^\s*\d+\.\s+", "", text, flags=re.M)
+    text = re.sub(r"[ \t]+", " ", text)
+    return text.strip()
+
+
+def _norm_sentence(text: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", text.lower())).strip()
+
+
+def _is_boilerplate(sentence: str, hit: SearchHit | None = None) -> bool:
+    """Drop title-only lines, relationship catalogs, and reference lists."""
+    text = sentence.strip()
+    if not text:
+        return True
+    low = text.lower()
+    if low.rstrip(":") in _HEADING_ONLY:
+        return True
+    title = (hit.title if hit else "") or ""
+    if title and _norm_sentence(text) == _norm_sentence(title):
+        return True
+    if re.match(r"^swc-\d+", low) and ":" in text and len(_terms(text)) <= 10:
+        return True
+    if "cwe-" in low or "ethtrust" in low or "security levels" in low:
+        return True
+    if "](" in text or re.search(r"https?://", text):
+        return True
+    if "adapted from" in low or "licensed under" in low or "source notice" in low:
+        return True
+    if re.search(r"\b(documentation|best practices|blog)\b", low) and len(_terms(text)) < 12:
+        return True
+    if low.endswith(":") and len(_terms(text)) <= 5:
+        return True
+    section = (hit.section if hit else "") or ""
+    if any(name in section.lower() for name in _LOW_SECTIONS):
+        # Keep a real prose sentence even in a low-priority section; drop lists.
+        if len(_terms(text)) < 8 or text.count(",") >= 2 and " and " not in low:
+            return True
+    return False
+
+
+def _section_weight(hit: SearchHit) -> float:
+    section = (hit.section or "").lower()
+    if any(name in section for name in _CONTENT_SECTIONS):
+        return 1.35
+    if any(name in section for name in _LOW_SECTIONS) or section.endswith(".sol"):
+        return 0.55
+    return 1.0
+
+
+_ABBREVIATIONS = ("a.k.a.", "e.g.", "i.e.", "etc.", "vs.", "cf.")
+_ABBR_DOT = "\u2044"
+
+
+def _unwrap_lines(text: str) -> str:
+    """Join soft-wrapped lines so a sentence split by a newline stays one sentence."""
+    pieces: list[str] = []
+    buf = ""
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line:
+            if buf:
+                pieces.append(buf)
+                buf = ""
+            continue
+        if not buf:
+            buf = line
+        elif line.startswith(("#", "-", "*", "+")):
+            pieces.append(buf)
+            buf = line
+        elif buf[-1] in ",;-" or (
+            buf[-1] not in ".!?"
+            and line[0].islower()
+            and not re.match(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+", line)
+        ):
+            # Soft-wrapped continuation (often starts lowercase), but not a new
+            # identifier sentence such as "tx.origin is a global variable...".
+            buf = f"{buf} {line}"
+        else:
+            pieces.append(buf)
+            buf = line
+    if buf:
+        pieces.append(buf)
+    return "\n".join(pieces)
+
+
+def _protect_abbreviations(text: str) -> str:
+    out = text
+    for abbr in _ABBREVIATIONS:
+        out = re.sub(re.escape(abbr), abbr.replace(".", _ABBR_DOT), out, flags=re.I)
+    return out
+
+
+def _restore_abbreviations(text: str) -> str:
+    return text.replace(_ABBR_DOT, ".")
+
+
+def _strip_title_prefix(sentence: str, hit: SearchHit | None) -> str:
+    if hit is None or not (hit.title or "").strip():
+        return sentence
+    title = hit.title.strip()
+    if sentence.lower().startswith(title.lower()):
+        rest = sentence[len(title):].lstrip(" \t:-—–")
+        if rest:
+            return rest
+    return sentence
+
+
+def _starts_like_prose(sentence: str) -> bool:
+    """Drop mid-chunk fragments that begin in the middle of a sentence."""
+    text = sentence.lstrip()
+    if not text:
+        return False
+    if text[0].isupper() or text[0].isdigit() or text[0] in "\"'`(":
+        return True
+    if re.match(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+\b", text):
+        return True
+    if re.match(r"^(delegatecall|require|revert|assert|pragma|function|address)\b", text, re.I):
+        return True
+    return False
+
+
+def _sentences(text: str, hit: SearchHit | None = None) -> list[str]:
+    text = _unwrap_lines(clean_markdown(text))
+    text = _protect_abbreviations(text)
     parts = re.split(r"(?<=[.!?])\s+|\n+", text)
     out: list[str] = []
     for part in parts:
-        s = re.sub(r"\s+", " ", part).strip()
-        if len(_terms(s)) >= 4:
-            out.append(s)
+        sent = _restore_abbreviations(re.sub(r"\s+", " ", part).strip(" \t-•"))
+        sent = _strip_title_prefix(sent, hit)
+        if not sent:
+            continue
+        if not _starts_like_prose(sent):
+            continue
+        if sent[-1] not in ".!?":
+            # Headings and bullets often have no period; only keep if they are prose.
+            if _is_boilerplate(sent, hit) or len(_terms(sent)) < 8:
+                continue
+        if len(_terms(sent)) < 4:
+            continue
+        if _is_boilerplate(sent, hit):
+            continue
+        out.append(sent)
     return out
+
+
+def _dedupe_key(sentence: str) -> str:
+    return _norm_sentence(sentence)
+
+
+
+
+def _is_duplicate(key: str, seen_text: set[str]) -> bool:
+    if key in seen_text:
+        return True
+    return any(
+        key in seen or seen in key
+        for seen in seen_text
+        if min(len(key), len(seen)) >= 20
+    )
 
 
 def extractive_generate(query: str, hits: list[SearchHit], *, min_overlap: int = 2) -> Answer:
     clean, flags = sanitize_hits(list(hits))
     q_terms = _terms(query)
-    scored: list[tuple[float, str, SearchHit, int]] = []
+    scored: list[tuple[float, int, str, SearchHit, int]] = []
     for rank, hit in enumerate(clean, start=1):
-        for sent in _sentences(hit.text):
-            sent_terms = _terms(sent)
+        for sent_i, sent in enumerate(_sentences(hit.text, hit)):
+            # Identifier lookups like "What is SWC-128 about?" mention the id in
+            # the document title, not always again in the body sentence.
+            sent_terms = _terms(sent) | _terms(hit.title or "") | _terms(hit.doc_id or "")
             overlap = _overlap(q_terms, sent_terms)
             if not _enough_overlap(overlap, q_terms, sent_terms, min_overlap):
                 continue
-            score = overlap / max(len(q_terms), 1)
-            scored.append((score, sent, hit, rank))
-    scored.sort(key=lambda item: item[0], reverse=True)
+            score = (overlap / max(len(q_terms), 1)) * _section_weight(hit)
+            scored.append((score, sent_i, sent, hit, rank))
+
+    content = [item for item in scored if _section_weight(item[3]) >= 1.2]
+    other = [item for item in scored if _section_weight(item[3]) < 1.2]
+    # Content-section prose is shown in document order so a definition is not
+    # displaced by a later sentence that merely repeats the query terms.
+    content.sort(key=lambda item: (item[4], item[1]))
+    other.sort(key=lambda item: item[0], reverse=True)
 
     picked: list[tuple[str, SearchHit, int]] = []
     seen_text: set[str] = set()
-    seen_chunks: set[str] = set()
-    for score, sent, hit, rank in scored:
-        key = re.sub(r"\s+", " ", sent.lower())
-        if key in seen_text:
-            continue
-        # prefer diversity across chunks, allow a second sentence from the same chunk
-        if hit.chunk_id in seen_chunks and sum(1 for _, h, _ in picked if h.chunk_id == hit.chunk_id) >= 1:
-            continue
+
+    def _try_add(sent: str, hit: SearchHit, rank: int, *, limit: int) -> bool:
+        if len(picked) >= 4:
+            return False
+        key = _dedupe_key(sent)
+        if _is_duplicate(key, seen_text):
+            return False
+        same = sum(1 for _, existing, _ in picked if existing.chunk_id == hit.chunk_id)
+        if same >= limit:
+            return False
         picked.append((sent, hit, rank))
         seen_text.add(key)
-        seen_chunks.add(hit.chunk_id)
-        if len(picked) >= 4:
-            break
+        return True
+
+    leading_doc = content[0][3].doc_id if content else None
+    for _score, _sent_i, sent, hit, rank in content:
+        if leading_doc and hit.doc_id != leading_doc:
+            continue
+        _try_add(sent, hit, rank, limit=3)
+    preferred_docs = {hit.doc_id for _sent, hit, _rank in picked}
+    if leading_doc:
+        preferred_docs.add(leading_doc)
+    same_doc = [item for item in other if item[3].doc_id in preferred_docs]
+    for _score, _sent_i, sent, hit, rank in same_doc:
+        _try_add(sent, hit, rank, limit=2)
+    # Additional documents fill remaining slots after the leading doc (and any
+    # same-document remediation) has been given first shot.
+    if len(picked) < 4:
+        for _score, _sent_i, sent, hit, rank in content:
+            if hit.doc_id in preferred_docs:
+                continue
+            _try_add(sent, hit, rank, limit=3)
+    if len(picked) < 3:
+        distant = [item for item in other if item[3].doc_id not in preferred_docs]
+        for _score, _sent_i, sent, hit, rank in distant:
+            _try_add(sent, hit, rank, limit=1)
 
     # If a chunk already contributed a query-overlap sentence, add one more
     # cited sentence from the same chunk so remediations that sit next to a
@@ -188,20 +400,20 @@ def extractive_generate(query: str, hits: list[SearchHit], *, min_overlap: int =
             if hit.chunk_id not in used_ids or len(picked) >= 4:
                 continue
             already = {
-                re.sub(r"\s+", " ", sent.lower())
+                _dedupe_key(sent)
                 for sent, h, _ in picked
                 if h.chunk_id == hit.chunk_id
             }
             extras = [
                 sent
-                for sent in _sentences(hit.text)
-                if re.sub(r"\s+", " ", sent.lower()) not in already
+                for sent in _sentences(hit.text, hit)
+                if _dedupe_key(sent) not in already and _dedupe_key(sent) not in seen_text
             ]
             extras.sort(key=lambda sent: len(_terms(sent)), reverse=True)
             if not extras:
                 continue
             sent = extras[0]
-            key = re.sub(r"\s+", " ", sent.lower())
+            key = _dedupe_key(sent)
             if key in seen_text:
                 continue
             picked.append((sent, hit, rank))
@@ -226,6 +438,21 @@ def extractive_generate(query: str, hits: list[SearchHit], *, min_overlap: int =
             generator="extractive",
             injection_flags=flags,
         )
+
+    def _order(item: tuple[str, SearchHit, int]) -> tuple[int, int]:
+        sent, hit, rank = item
+        section = (hit.section or "").lower()
+        if "description" in section:
+            bucket = 0
+        elif "attack" in section:
+            bucket = 1
+        elif "remediation" in section or "mitigation" in section:
+            bucket = 2
+        else:
+            bucket = 3
+        return (bucket, rank)
+
+    picked.sort(key=_order)
 
     lines: list[str] = []
     used: list[str] = []

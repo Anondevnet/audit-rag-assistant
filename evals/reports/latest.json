@@ -44,7 +44,7 @@
     },
     "n_answerable": 18,
     "n_non_refusal_answers": 18,
-    "elapsed_ms": 94.4
+    "elapsed_ms": 164.2
   },
   "records": [
     {
@@ -83,41 +83,39 @@
         "swc-119",
         "swc-101"
       ],
-      "answer": "Historically, it has often been recommended to use these functions for value transfers to guard against reentrancy attacks [6:swc-134#c0]. # SWC-107: Reentrancy ## Relationships [CWE-841: Improper Enforcement of Behavioral Workflow](https://cwe.mitre.org/data/definitions/841.html) ## Description One of the major dangers of calling external contracts is that they can take over the control flow [3:swc-107#c1]. Adapted from SWC Registry (https://github.com/SmartContractSecurity/SWC-registry/blob/1b6227074ecd180b374e4844153afdda0332f979/entries/docs/SWC-112.md), MIT licensed [5:swc-112#c7]. Adapted from SWC Registry (https://github.com/SmartContractSecurity/SWC-registry/blob/1b6227074ecd180b374e4844153afdda0332f979/entries/docs/SWC-101.md), MIT licensed [10:swc-101#c19].",
+      "answer": "One of the major dangers of calling external contracts is that they can take over the control flow [1:swc-107#c0]. In the reentrancy attack (a.k.a. recursive call attack), a malicious contract calls back into the calling contract before the first invocation of the function is finished [1:swc-107#c0]. This may cause the different invocations of the function to interact in undesirable ways [1:swc-107#c0]. Make sure all internal state changes are performed before the call is executed [3:swc-107#c1].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
-        "swc-134#c0",
-        "swc-107#c1",
-        "swc-112#c7",
-        "swc-101#c19"
+        "swc-107#c0",
+        "swc-107#c1"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "Historically, it has often been recommended to use these functions for value transfers to guard against reentrancy attacks [6:swc-134#c0].",
+          "claim": "One of the major dangers of calling external contracts is that they can take over the control flow [1:swc-107#c0].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "# SWC-107: Reentrancy ## Relationships [CWE-841: Improper Enforcement of Behavioral Workflow](https://cwe.mitre.org/data/definitions/841.html) ## Description One of the major dangers of calling external contracts is that they can take over the control flow [3:swc-107#c1].",
+          "claim": "recursive call attack), a malicious contract calls back into the calling contract before the first invocation of the function is finished [1:swc-107#c0].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "Adapted from SWC Registry (https://github.com/SmartContractSecurity/SWC-registry/blob/1b6227074ecd180b374e4844153afdda0332f979/entries/docs/SWC-112.md), MIT licensed [5:swc-112#c7].",
+          "claim": "This may cause the different invocations of the function to interact in undesirable ways [1:swc-107#c0].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "Adapted from SWC Registry (https://github.com/SmartContractSecurity/SWC-registry/blob/1b6227074ecd180b374e4844153afdda0332f979/entries/docs/SWC-101.md), MIT licensed [10:swc-101#c19].",
+          "claim": "Make sure all internal state changes are performed before the call is executed [3:swc-107#c1].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 3.73,
-      "generate_ms": 2.61,
+      "retrieve_ms": 6.71,
+      "generate_ms": 8.61,
       "injection_flags": []
     },
     {
@@ -157,36 +155,39 @@
         "nssc-bad-randomness",
         "nssc-reentrancy"
       ],
-      "answer": "# not-so-smart-contracts: Re-entrancy [2:nssc-reentrancy#c0] # not-so-smart-contracts: Re-entrancy A state variable is changed after a contract uses `call.value` [3:nssc-reentrancy#c1]. # not-so-smart-contracts: Wrong Constructor Name A function intended to be a constructor is named incorrectly, which causes it to end up in the runtime bytecode instead of being a constructor [5:nssc-wrong-constructor-name#c1]. Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/reentrancy/README.md), licensed under the Apache License 2.0 [10:nssc-reentrancy#c4].",
+      "answer": "A state variable is changed after a contract uses call.value [3:nssc-reentrancy#c1]. A contract that holds a map of account balances allows users to call a withdraw function [1:nssc-reentrancy#c2]. However, withdraw calls send which transfers control to the calling contract, but doesn't decrease their balance until after send has finished executing [1:nssc-reentrancy#c2]. The attacker can then repeatedly withdraw money that they do not have [1:nssc-reentrancy#c2].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
-        "nssc-reentrancy#c0",
         "nssc-reentrancy#c1",
-        "nssc-wrong-constructor-name#c1",
-        "nssc-reentrancy#c4"
+        "nssc-reentrancy#c2"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "# not-so-smart-contracts: Re-entrancy [2:nssc-reentrancy#c0] # not-so-smart-contracts: Re-entrancy A state variable is changed after a contract uses `call.value` [3:nssc-reentrancy#c1].",
+          "claim": "A state variable is changed after a contract uses call.value [3:nssc-reentrancy#c1].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "# not-so-smart-contracts: Wrong Constructor Name A function intended to be a constructor is named incorrectly, which causes it to end up in the runtime bytecode instead of being a constructor [5:nssc-wrong-constructor-name#c1].",
+          "claim": "A contract that holds a map of account balances allows users to call a withdraw function [1:nssc-reentrancy#c2].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/reentrancy/README.md), licensed under the Apache License 2.0 [10:nssc-reentrancy#c4].",
+          "claim": "However, withdraw calls send which transfers control to the calling contract, but doesn't decrease their balance until after send has finished executing [1:nssc-reentrancy#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "The attacker can then repeatedly withdraw money that they do not have [1:nssc-reentrancy#c2].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 2.32,
-      "generate_ms": 1.95,
+      "retrieve_ms": 4.49,
+      "generate_ms": 3.5,
       "injection_flags": []
     },
     {
@@ -225,26 +226,39 @@
         "swc-100",
         "swc-135"
       ],
-      "answer": "- [SigmaPrime - Visibility](https://github.com/sigp/solidity-security-blog#visibility) [1:swc-100#c3] # SWC-100: Function Default Visibility ## Relationships - [CWE-710: Improper Adherence to Coding Standards](https://cwe.mitre.org/data/definitions/710.html) - EthTrust Security Levels: - [**[Q] Code Linting**](https://entethalliance.org/specs/ethtrust-sl/#req-3-linted) [3:swc-100#c1] ## References - [Issue on Solidity's Github - Shadowing of inherited state variables should be an error (override keyword)](https://github.com/ethereum/solidity/issues/2563) - [Issue on Solidity's Github - Warn about shadowing state variables](https://github.com/ethereum/solidity/issues/973) EthTrust Security Levels: - [**[Q] Implement as Documented**](https://entethalliance.org/specs/ethtrust-sl/#req-3-implement-as-documented) [5:swc-119#c4] ## References - [Ethereum Smart Contract Best Practices - Visibility](https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/visibility/) - [SigmaPrime - Visibility](https://github.com/sigp/solidity-security-blog#visibility) ## Samples [9:swc-100#c4]",
+      "answer": "Functions that do not have a function visibility type specified are public by default [3:swc-100#c1]. This can lead to a vulnerability if a developer forgot to set the visibility and a malicious user is able to make unauthorized or unintended state changes [3:swc-100#c1]. Functions can be specified as being external, public, internal or private [6:swc-100#c2]. It is recommended to make a conscious decision on which visibility type is appropriate for a function [6:swc-100#c2].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
-        "swc-100#c3",
         "swc-100#c1",
-        "swc-119#c4",
-        "swc-100#c4"
+        "swc-100#c2"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "- [SigmaPrime - Visibility](https://github.com/sigp/solidity-security-blog#visibility) [1:swc-100#c3] # SWC-100: Function Default Visibility ## Relationships - [CWE-710: Improper Adherence to Coding Standards](https://cwe.mitre.org/data/definitions/710.html) - EthTrust Security Levels: - [**[Q] Code Linting**](https://entethalliance.org/specs/ethtrust-sl/#req-3-linted) [3:swc-100#c1] ## References - [Issue on Solidity's Github - Shadowing of inherited state variables should be an error (override keyword)](https://github.com/ethereum/solidity/issues/2563) - [Issue on Solidity's Github - Warn about shadowing state variables](https://github.com/ethereum/solidity/issues/973) EthTrust Security Levels: - [**[Q] Implement as Documented**](https://entethalliance.org/specs/ethtrust-sl/#req-3-implement-as-documented) [5:swc-119#c4] ## References - [Ethereum Smart Contract Best Practices - Visibility](https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/visibility/) - [SigmaPrime - Visibility](https://github.com/sigp/solidity-security-blog#visibility) ## Samples [9:swc-100#c4]",
+          "claim": "Functions that do not have a function visibility type specified are public by default [3:swc-100#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "This can lead to a vulnerability if a developer forgot to set the visibility and a malicious user is able to make unauthorized or unintended state changes [3:swc-100#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "Functions can be specified as being external, public, internal or private [6:swc-100#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "It is recommended to make a conscious decision on which visibility type is appropriate for a function [6:swc-100#c2].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 1.67,
-      "generate_ms": 2.04,
+      "retrieve_ms": 5.0,
+      "generate_ms": 2.63,
       "injection_flags": []
     },
     {
@@ -283,25 +297,23 @@
         "swc-101",
         "swc-101"
       ],
-      "answer": "# SWC-101: Integer Overflow and Underflow ## Relationships - [CWE-682: Incorrect Calculation](https://cwe.mitre.org/data/definitions/682.html) - EthTrust Security Levels: - [**[S] No Overflow/Underflow**](https://entethalliance.org/specs/ethtrust-sl/#req-1-overflow-underflow) - [**[M] Safe Overflow/Underflow**](https://entethalliance.org/specs/ethtrust-sl/#req-2-overflow-underflow) - [**[M] Documented Defensive Coding**](https://entethalliance.org/specs/ethtrust-sl/#req-2-documented) [4:swc-101#c1] # not-so-smart-contracts: Integer Overflow It is possible to cause `add` and `sub` to overflow (or underflow) on any type of integer in Solidity [2:nssc-integer-overflow#c1]. It is possible to cause `add` and `sub` to overflow (or underflow) on any type of integer in Solidity [3:nssc-integer-overflow#c0]. In computer programming, an integer overflow occurs when an arithmetic operation attempts to create a numeric value that is outside of the range that can be represented with a given number of bits \u2013 either larger than the maximum or lower than the minimum representable value [1:swc-101#c2].",
+      "answer": "An overflow/underflow happens when an arithmetic operation reaches the maximum or minimum size of a type [4:swc-101#c1]. For instance if a number is stored in the uint8 type, it means that the number is stored in a 8 bits unsigned number ranging from 0 to 2^8-1 [1:swc-101#c2]. In computer programming, an integer overflow occurs when an arithmetic operation attempts to create a numeric value that is outside of the range that can be represented with a given number of bits \u2013 either larger than the maximum or lower than the minimum representable value [1:swc-101#c2]. It is recommended to use vetted safe math libraries for arithmetic operations consistently throughout the smart contract system [1:swc-101#c2].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
         "swc-101#c1",
-        "nssc-integer-overflow#c1",
-        "nssc-integer-overflow#c0",
         "swc-101#c2"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "# SWC-101: Integer Overflow and Underflow ## Relationships - [CWE-682: Incorrect Calculation](https://cwe.mitre.org/data/definitions/682.html) - EthTrust Security Levels: - [**[S] No Overflow/Underflow**](https://entethalliance.org/specs/ethtrust-sl/#req-1-overflow-underflow) - [**[M] Safe Overflow/Underflow**](https://entethalliance.org/specs/ethtrust-sl/#req-2-overflow-underflow) - [**[M] Documented Defensive Coding**](https://entethalliance.org/specs/ethtrust-sl/#req-2-documented) [4:swc-101#c1] # not-so-smart-contracts: Integer Overflow It is possible to cause `add` and `sub` to overflow (or underflow) on any type of integer in Solidity [2:nssc-integer-overflow#c1].",
+          "claim": "An overflow/underflow happens when an arithmetic operation reaches the maximum or minimum size of a type [4:swc-101#c1].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "It is possible to cause `add` and `sub` to overflow (or underflow) on any type of integer in Solidity [3:nssc-integer-overflow#c0].",
+          "claim": "For instance if a number is stored in the uint8 type, it means that the number is stored in a 8 bits unsigned number ranging from 0 to 2^8-1 [1:swc-101#c2].",
           "ok": true,
           "reason": "ok"
         },
@@ -309,10 +321,15 @@
           "claim": "In computer programming, an integer overflow occurs when an arithmetic operation attempts to create a numeric value that is outside of the range that can be represented with a given number of bits \u2013 either larger than the maximum or lower than the minimum representable value [1:swc-101#c2].",
           "ok": true,
           "reason": "ok"
+        },
+        {
+          "claim": "It is recommended to use vetted safe math libraries for arithmetic operations consistently throughout the smart contract system [1:swc-101#c2].",
+          "ok": true,
+          "reason": "ok"
         }
       ],
-      "retrieve_ms": 2.18,
-      "generate_ms": 1.86,
+      "retrieve_ms": 2.6,
+      "generate_ms": 2.31,
       "injection_flags": []
     },
     {
@@ -351,31 +368,39 @@
         "nssc-integer-overflow",
         "swc-107"
       ],
-      "answer": "# SWC-115: Authorization through tx.origin ## Relationships - [CWE-477: Use of Obsolete Function](https://cwe.mitre.org/data/definitions/477.html) - EEA EthTrust Security Levels: - [**[S] No `tx.origin`**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-1-no-tx.origin) - [**[Q] Verify `tx.origin` Usage**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-3-verify-tx.origin) [1:swc-115#c1] # SWC-115: Authorization through tx.origin [2:swc-115#c0] A call could be made to the vulnerable contract that passes the authorization check since `tx.origin` returns the original sender of the transaction which in this case is the authorized account [4:swc-115#c2]. ## Remediation `tx.origin` should not be used for authorization [5:swc-115#c3].",
+      "answer": "tx.origin is a global variable in Solidity which returns the address of the account that sent the transaction [1:swc-115#c1]. Using the variable for authorization could make a contract vulnerable if an authorized account calls into a malicious contract [1:swc-115#c1]. A call could be made to the vulnerable contract that passes the authorization check since tx.origin returns the original sender of the transaction which in this case is the authorized account [1:swc-115#c1]. tx.origin should not be used for authorization [5:swc-115#c3].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
         "swc-115#c1",
-        "swc-115#c0",
-        "swc-115#c2",
         "swc-115#c3"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "# SWC-115: Authorization through tx.origin ## Relationships - [CWE-477: Use of Obsolete Function](https://cwe.mitre.org/data/definitions/477.html) - EEA EthTrust Security Levels: - [**[S] No `tx.origin`**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-1-no-tx.origin) - [**[Q] Verify `tx.origin` Usage**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-3-verify-tx.origin) [1:swc-115#c1] # SWC-115: Authorization through tx.origin [2:swc-115#c0] A call could be made to the vulnerable contract that passes the authorization check since `tx.origin` returns the original sender of the transaction which in this case is the authorized account [4:swc-115#c2].",
+          "claim": "tx.origin is a global variable in Solidity which returns the address of the account that sent the transaction [1:swc-115#c1].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "## Remediation `tx.origin` should not be used for authorization [5:swc-115#c3].",
+          "claim": "Using the variable for authorization could make a contract vulnerable if an authorized account calls into a malicious contract [1:swc-115#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "A call could be made to the vulnerable contract that passes the authorization check since tx.origin returns the original sender of the transaction which in this case is the authorized account [1:swc-115#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "tx.origin should not be used for authorization [5:swc-115#c3].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 1.64,
-      "generate_ms": 2.24,
+      "retrieve_ms": 1.73,
+      "generate_ms": 2.52,
       "injection_flags": []
     },
     {
@@ -414,31 +439,39 @@
         "swc-126",
         "swc-103"
       ],
-      "answer": "# SWC-103: Floating Pragma ## Relationships - [CWE-664: Improper Control of a Resource Through its Lifetime](https://cwe.mitre.org/data/definitions/664.html) - EEA EthTrust Security Levels: - [**Level [S]** Improved Compilers](https://entethalliance.org/specs/ethtrust-sl/#sec-1-compile-improvements) - [**Level [S]** Compiler Security Bugs](https://entethalliance.org/specs/ethtrust-sl/#sec-1-compiler-bugs) - [**Level [M]** Compiler Bugs and Overriding Requirements](https://entethalliance.org/specs/ethtrust-sl/#sec-level-2-compiler-bugs) - [**Recommended Practice** Use the Latest Compiler](https://entethalliance.org/specs/ethtrust-sl/#req-R-use-latest-compiler) [3:swc-103#c1] # SWC-103: Floating Pragma [10:swc-103#c0] Locking the pragma helps to ensure that contracts do not accidentally get deployed using, for example, an outdated compiler version that might introduce bugs that affect the contract system negatively [1:swc-103#c2]. ## References - [Ethereum Smart Contract Best Practices - Locking Pragmas](https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/locking-pragmas/) ## Samples ### floating_pragma.sol [2:swc-103#c4]",
+      "answer": "Contracts should be deployed with the same compiler version and flags that they have been tested with thoroughly [1:swc-103#c2]. Locking the pragma helps to ensure that contracts do not accidentally get deployed using, for example, an outdated compiler version that might introduce bugs that affect the contract system negatively [1:swc-103#c2]. Pragma statements can be allowed to float when a contract is intended for consumption by other developers, as in the case with contracts in a library or EthPM package [1:swc-103#c2]. Otherwise, the developer would need to manually update the pragma in order to compile locally [5:swc-103#c3].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
-        "swc-103#c1",
-        "swc-103#c0",
         "swc-103#c2",
-        "swc-103#c4"
+        "swc-103#c3"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "# SWC-103: Floating Pragma ## Relationships - [CWE-664: Improper Control of a Resource Through its Lifetime](https://cwe.mitre.org/data/definitions/664.html) - EEA EthTrust Security Levels: - [**Level [S]** Improved Compilers](https://entethalliance.org/specs/ethtrust-sl/#sec-1-compile-improvements) - [**Level [S]** Compiler Security Bugs](https://entethalliance.org/specs/ethtrust-sl/#sec-1-compiler-bugs) - [**Level [M]** Compiler Bugs and Overriding Requirements](https://entethalliance.org/specs/ethtrust-sl/#sec-level-2-compiler-bugs) - [**Recommended Practice** Use the Latest Compiler](https://entethalliance.org/specs/ethtrust-sl/#req-R-use-latest-compiler) [3:swc-103#c1] # SWC-103: Floating Pragma [10:swc-103#c0] Locking the pragma helps to ensure that contracts do not accidentally get deployed using, for example, an outdated compiler version that might introduce bugs that affect the contract system negatively [1:swc-103#c2].",
+          "claim": "Contracts should be deployed with the same compiler version and flags that they have been tested with thoroughly [1:swc-103#c2].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "## References - [Ethereum Smart Contract Best Practices - Locking Pragmas](https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/locking-pragmas/) ## Samples ### floating_pragma.sol [2:swc-103#c4]",
+          "claim": "Locking the pragma helps to ensure that contracts do not accidentally get deployed using, for example, an outdated compiler version that might introduce bugs that affect the contract system negatively [1:swc-103#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "Pragma statements can be allowed to float when a contract is intended for consumption by other developers, as in the case with contracts in a library or EthPM package [1:swc-103#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "Otherwise, the developer would need to manually update the pragma in order to compile locally [5:swc-103#c3].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 2.14,
-      "generate_ms": 2.17,
+      "retrieve_ms": 2.95,
+      "generate_ms": 2.13,
       "injection_flags": []
     },
     {
@@ -477,36 +510,39 @@
         "swc-127",
         "swc-135"
       ],
-      "answer": "## Description The return value of a message call is not checked [1:swc-104#c2]. # SWC-104: Unchecked Call Return Value ## Relationships - [CWE-252: Unchecked Return Value](https://cwe.mitre.org/data/definitions/252.html) - EthTrust Security Levels: - [**[M] Handle External Call Returns**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-2-handle-return) [2:swc-104#c1] ## Remediation If you choose to use low-level call methods, make sure to handle the possibility that the call will fail by checking the return value [4:swc-104#c3]. It takes advantage of the low-level call in the function `CashOut()` by `msg.sender.call.value(_am)())` [6:nssc-honeypots#c4].",
+      "answer": "The return value of a message call is not checked [1:swc-104#c2]. Execution will resume even if the called contract throws an exception [1:swc-104#c2]. If the call fails accidentally or an attacker forces the call to fail, this may cause unexpected behaviour in the subsequent program logic [1:swc-104#c2]. If you choose to use low-level call methods, make sure to handle the possibility that the call will fail by checking the return value [4:swc-104#c3].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
         "swc-104#c2",
-        "swc-104#c1",
-        "swc-104#c3",
-        "nssc-honeypots#c4"
+        "swc-104#c3"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "## Description The return value of a message call is not checked [1:swc-104#c2].",
+          "claim": "The return value of a message call is not checked [1:swc-104#c2].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "# SWC-104: Unchecked Call Return Value ## Relationships - [CWE-252: Unchecked Return Value](https://cwe.mitre.org/data/definitions/252.html) - EthTrust Security Levels: - [**[M] Handle External Call Returns**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-2-handle-return) [2:swc-104#c1] ## Remediation If you choose to use low-level call methods, make sure to handle the possibility that the call will fail by checking the return value [4:swc-104#c3].",
+          "claim": "Execution will resume even if the called contract throws an exception [1:swc-104#c2].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "It takes advantage of the low-level call in the function `CashOut()` by `msg.sender.call.value(_am)())` [6:nssc-honeypots#c4].",
+          "claim": "If the call fails accidentally or an attacker forces the call to fail, this may cause unexpected behaviour in the subsequent program logic [1:swc-104#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "If you choose to use low-level call methods, make sure to handle the possibility that the call will fail by checking the return value [4:swc-104#c3].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 2.15,
-      "generate_ms": 3.22,
+      "retrieve_ms": 2.38,
+      "generate_ms": 4.24,
       "injection_flags": []
     },
     {
@@ -545,31 +581,39 @@
         "swc-124",
         "nssc-unprotected-function"
       ],
-      "answer": "# SWC-105: Unprotected Ether Withdrawal ## Relationships - [CWE-284: Improper Access Control](https://cwe.mitre.org/data/definitions/284.html) - EthTrust Security Levels: - [**[M] Protect Self-destruction**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-2-self-destruct) - [**[Q] Enforce Least Privilege**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-3-access-control) [3:swc-105#c1] # SWC-105: Unprotected Ether Withdrawal [8:swc-105#c0] ## Description Due to missing or insufficient access controls, malicious parties can withdraw some or all Ether from the contract account [1:swc-105#c2]. */ function newOwner(address _owner) external returns (bool) { require(_owner != 0); owners[_owner] = msg.sender; return true; } /** * @dev Deleting owners */ function deleteOwner(address _owner) onlyOwner external returns (bool) { require(owners[_owner] == msg.sender || (owners[_owner] != 0 && msg.sender == root)); owners[_owner] = 0; return true; } } contract TestContract is MultiOwnable { function withdrawAll() onlyOwner { msg.sender.transfer(this.balance); } function() payable { } } solidity [2:swc-105#c7]",
+      "answer": "Due to missing or insufficient access controls, malicious parties can withdraw some or all Ether from the contract account [1:swc-105#c2]. This bug is sometimes caused by unintentionally exposing initialization functions [1:swc-105#c2]. By wrongly naming a function intended to be a constructor, the constructor code ends up in the runtime byte code and can be called by anyone to re-initialize the contract [1:swc-105#c2]. function migrateTo(address to) public { require(creator == msg.sender); to.transfer(this.balance); } } solidity pragma solidity ^0.4.24; [4:swc-105#c10]",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
-        "swc-105#c1",
-        "swc-105#c0",
         "swc-105#c2",
-        "swc-105#c7"
+        "swc-105#c10"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "# SWC-105: Unprotected Ether Withdrawal ## Relationships - [CWE-284: Improper Access Control](https://cwe.mitre.org/data/definitions/284.html) - EthTrust Security Levels: - [**[M] Protect Self-destruction**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-2-self-destruct) - [**[Q] Enforce Least Privilege**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-3-access-control) [3:swc-105#c1] # SWC-105: Unprotected Ether Withdrawal [8:swc-105#c0] ## Description Due to missing or insufficient access controls, malicious parties can withdraw some or all Ether from the contract account [1:swc-105#c2].",
+          "claim": "Due to missing or insufficient access controls, malicious parties can withdraw some or all Ether from the contract account [1:swc-105#c2].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "*/ function newOwner(address _owner) external returns (bool) { require(_owner != 0); owners[_owner] = msg.sender; return true; } /** * @dev Deleting owners */ function deleteOwner(address _owner) onlyOwner external returns (bool) { require(owners[_owner] == msg.sender || (owners[_owner] != 0 && msg.sender == root)); owners[_owner] = 0; return true; } } contract TestContract is MultiOwnable { function withdrawAll() onlyOwner { msg.sender.transfer(this.balance); } function() payable { } } solidity [2:swc-105#c7]",
+          "claim": "This bug is sometimes caused by unintentionally exposing initialization functions [1:swc-105#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "By wrongly naming a function intended to be a constructor, the constructor code ends up in the runtime byte code and can be called by anyone to re-initialize the contract [1:swc-105#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "function migrateTo(address to) public { require(creator == msg.sender); to.transfer(this.balance); } } solidity pragma solidity ^0.4.24; [4:swc-105#c10]",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 1.59,
-      "generate_ms": 2.61,
+      "retrieve_ms": 1.64,
+      "generate_ms": 3.39,
       "injection_flags": []
     },
     {
@@ -607,36 +651,39 @@
         "swc-105",
         "nssc-forced-ether-reception"
       ],
-      "answer": "Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/forced_ether_reception/README.md), licensed under the Apache License 2.0 [10:nssc-forced-ether-reception#c4]. # not-so-smart-contracts: Contracts can be forced to receive ether [2:nssc-forced-ether-reception#c0] # not-so-smart-contracts: Contracts can be forced to receive ether In certain circunstances, contracts can be forced to receive ether without triggering any code [3:nssc-forced-ether-reception#c1]. # not-so-smart-contracts: Wrong Constructor Name A function intended to be a constructor is named incorrectly, which causes it to end up in the runtime bytecode instead of being a constructor [7:nssc-wrong-constructor-name#c1].",
+      "answer": "In certain circunstances, contracts can be forced to receive ether without triggering any code [3:nssc-forced-ether-reception#c1]. Example - The MyAdvancedToken contract in coin.sol is vulnerable to this attack [1:nssc-forced-ether-reception#c3]. It will stop the owner to perform the migration of the contract [1:nssc-forced-ether-reception#c3]. There is no way to block the reception of ether [1:nssc-forced-ether-reception#c3].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
-        "nssc-forced-ether-reception#c4",
-        "nssc-forced-ether-reception#c0",
         "nssc-forced-ether-reception#c1",
-        "nssc-wrong-constructor-name#c1"
+        "nssc-forced-ether-reception#c3"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/forced_ether_reception/README.md), licensed under the Apache License 2.0 [10:nssc-forced-ether-reception#c4].",
+          "claim": "In certain circunstances, contracts can be forced to receive ether without triggering any code [3:nssc-forced-ether-reception#c1].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "# not-so-smart-contracts: Contracts can be forced to receive ether [2:nssc-forced-ether-reception#c0] # not-so-smart-contracts: Contracts can be forced to receive ether In certain circunstances, contracts can be forced to receive ether without triggering any code [3:nssc-forced-ether-reception#c1].",
+          "claim": "Example - The MyAdvancedToken contract in coin.sol is vulnerable to this attack [1:nssc-forced-ether-reception#c3].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "# not-so-smart-contracts: Wrong Constructor Name A function intended to be a constructor is named incorrectly, which causes it to end up in the runtime bytecode instead of being a constructor [7:nssc-wrong-constructor-name#c1].",
+          "claim": "It will stop the owner to perform the migration of the contract [1:nssc-forced-ether-reception#c3].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "There is no way to block the reception of ether [1:nssc-forced-ether-reception#c3].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 2.28,
-      "generate_ms": 1.69,
+      "retrieve_ms": 2.94,
+      "generate_ms": 2.47,
       "injection_flags": []
     },
     {
@@ -678,31 +725,39 @@
         "swc-120",
         "swc-116"
       ],
-      "answer": "# SWC-120: Weak Sources of Randomness from Chain Attributes ## Relationships - [CWE-330: Use of Insufficiently Random Values](https://cwe.mitre.org/data/definitions/330.html) - EthTrust Security Levels: - [**[M] Sources of Randomness**](https://entethalliance.org/specs/ethtrust-sl/#req-2-random-enough) - [**[M] Document Special Code Use**](https://entethalliance.org/specs/ethtrust-sl/#req-2-documented) [1:swc-120#c1] contract RandomNumberGenerator { uint256 private salt = block.timestamp; function random(uint max) view private returns (uint256 result) { // Get the best seed for randomness uint256 x = salt * 100 / max; uint256 y = salt * block.number / (salt % 5); uint256 seed = block.number / 3 + (salt % 300) + y; uint256 h = uint256(blockhash(seed)); // Random number between 1 and max return uint256((h / x)) % max + 1; } } ``` [4:swc-120#c9] - Using external sources of randomness via oracles, and cryptographically checking the outcome of the oracle on-chain [2:swc-120#c2]. It used the blockhash, timestamp and block number to generate numbers in a range to determine winners of the lottery [8:nssc-bad-randomness#c3].",
+      "answer": "Ability to generate random numbers is very helpful in all kinds of applications [1:swc-120#c1]. One obvious example is gambling DApps, where pseudo-random number generator is used to pick the winner [1:swc-120#c1]. However, creating a strong enough source of randomness in Ethereum is very challenging [1:swc-120#c1]. For example, use of block.timestamp is insecure, as a miner can choose to provide any timestamp within a few seconds and still get his block accepted by others [2:swc-120#c2].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
         "swc-120#c1",
-        "swc-120#c9",
-        "swc-120#c2",
-        "nssc-bad-randomness#c3"
+        "swc-120#c2"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "# SWC-120: Weak Sources of Randomness from Chain Attributes ## Relationships - [CWE-330: Use of Insufficiently Random Values](https://cwe.mitre.org/data/definitions/330.html) - EthTrust Security Levels: - [**[M] Sources of Randomness**](https://entethalliance.org/specs/ethtrust-sl/#req-2-random-enough) - [**[M] Document Special Code Use**](https://entethalliance.org/specs/ethtrust-sl/#req-2-documented) [1:swc-120#c1] contract RandomNumberGenerator { uint256 private salt = block.timestamp; function random(uint max) view private returns (uint256 result) { // Get the best seed for randomness uint256 x = salt * 100 / max; uint256 y = salt * block.number / (salt % 5); uint256 seed = block.number / 3 + (salt % 300) + y; uint256 h = uint256(blockhash(seed)); // Random number between 1 and max return uint256((h / x)) % max + 1; } } ``` [4:swc-120#c9] - Using external sources of randomness via oracles, and cryptographically checking the outcome of the oracle on-chain [2:swc-120#c2].",
+          "claim": "Ability to generate random numbers is very helpful in all kinds of applications [1:swc-120#c1].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "It used the blockhash, timestamp and block number to generate numbers in a range to determine winners of the lottery [8:nssc-bad-randomness#c3].",
+          "claim": "One obvious example is gambling DApps, where pseudo-random number generator is used to pick the winner [1:swc-120#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "However, creating a strong enough source of randomness in Ethereum is very challenging [1:swc-120#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "For example, use of block.timestamp is insecure, as a miner can choose to provide any timestamp within a few seconds and still get his block accepted by others [2:swc-120#c2].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 2.03,
-      "generate_ms": 4.02,
+      "retrieve_ms": 2.4,
+      "generate_ms": 4.73,
       "injection_flags": []
     },
     {
@@ -741,36 +796,39 @@
         "nssc-unchecked-external-call",
         "nssc-reentrancy"
       ],
-      "answer": "# not-so-smart-contracts: Wrong Constructor Name A function intended to be a constructor is named incorrectly, which causes it to end up in the runtime bytecode instead of being a constructor [2:nssc-wrong-constructor-name#c1]. # not-so-smart-contracts: Wrong Constructor Name [1:nssc-wrong-constructor-name#c0] Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/wrong_constructor_name/README.md), licensed under the Apache License 2.0 [8:nssc-wrong-constructor-name#c3]. # not-so-smart-contracts: Unprotected function Missing (or incorrectly used) modifier on a function allows an attacker to use sensitive functionality in the contract [4:nssc-unprotected-function#c1].",
+      "answer": "A function intended to be a constructor is named incorrectly, which causes it to end up in the runtime bytecode instead of being a constructor [2:nssc-wrong-constructor-name#c1]. Anyone can call the function that was supposed to be the constructor [2:nssc-wrong-constructor-name#c1]. As a result anyone can change the state variables initialized in this function [2:nssc-wrong-constructor-name#c1]. See data/licenses/not-so-smart-contracts-LICENSE [8:nssc-wrong-constructor-name#c3].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
         "nssc-wrong-constructor-name#c1",
-        "nssc-wrong-constructor-name#c0",
-        "nssc-wrong-constructor-name#c3",
-        "nssc-unprotected-function#c1"
+        "nssc-wrong-constructor-name#c3"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "# not-so-smart-contracts: Wrong Constructor Name A function intended to be a constructor is named incorrectly, which causes it to end up in the runtime bytecode instead of being a constructor [2:nssc-wrong-constructor-name#c1].",
+          "claim": "A function intended to be a constructor is named incorrectly, which causes it to end up in the runtime bytecode instead of being a constructor [2:nssc-wrong-constructor-name#c1].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "# not-so-smart-contracts: Wrong Constructor Name [1:nssc-wrong-constructor-name#c0] Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/wrong_constructor_name/README.md), licensed under the Apache License 2.0 [8:nssc-wrong-constructor-name#c3].",
+          "claim": "Anyone can call the function that was supposed to be the constructor [2:nssc-wrong-constructor-name#c1].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "# not-so-smart-contracts: Unprotected function Missing (or incorrectly used) modifier on a function allows an attacker to use sensitive functionality in the contract [4:nssc-unprotected-function#c1].",
+          "claim": "As a result anyone can change the state variables initialized in this function [2:nssc-wrong-constructor-name#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "See data/licenses/not-so-smart-contracts-LICENSE [8:nssc-wrong-constructor-name#c3].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 2.05,
-      "generate_ms": 1.67,
+      "retrieve_ms": 2.27,
+      "generate_ms": 2.65,
       "injection_flags": []
     },
     {
@@ -810,31 +868,39 @@
         "swc-112",
         "nssc-denial-of-service"
       ],
-      "answer": "# SWC-112: Delegatecall to Untrusted Callee [1:swc-112#c0] # SWC-112: Delegatecall to Untrusted Callee ## Relationships [CWE-829: Inclusion of Functionality from Untrusted Control Sphere](https://cwe.mitre.org/data/definitions/829.html) [3:swc-112#c1] Use `delegatecall` with caution and make sure to never call into untrusted contracts [2:swc-112#c2]. ## Remediation Use `delegatecall` with caution and make sure to never call into untrusted contracts [6:swc-112#c3].",
+      "answer": "There exists a special variant of a message call, named delegatecall which is identical to a message call apart from the fact that the code at the target address is executed in the context of the calling contract and msg.sender and msg.value do not change their values [3:swc-112#c1]. This allows a smart contract to dynamically load code from a different address at runtime [2:swc-112#c2]. Storage, current address and balance still refer to the calling contract [2:swc-112#c2]. Calling into untrusted contracts is very dangerous, as the code at the target address can change any storage values of the caller and has full control over the caller's balance [2:swc-112#c2].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
-        "swc-112#c0",
         "swc-112#c1",
-        "swc-112#c2",
-        "swc-112#c3"
+        "swc-112#c2"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "# SWC-112: Delegatecall to Untrusted Callee [1:swc-112#c0] # SWC-112: Delegatecall to Untrusted Callee ## Relationships [CWE-829: Inclusion of Functionality from Untrusted Control Sphere](https://cwe.mitre.org/data/definitions/829.html) [3:swc-112#c1] Use `delegatecall` with caution and make sure to never call into untrusted contracts [2:swc-112#c2].",
+          "claim": "There exists a special variant of a message call, named delegatecall which is identical to a message call apart from the fact that the code at the target address is executed in the context of the calling contract and msg.sender and msg.value do not change their values [3:swc-112#c1].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "## Remediation Use `delegatecall` with caution and make sure to never call into untrusted contracts [6:swc-112#c3].",
+          "claim": "This allows a smart contract to dynamically load code from a different address at runtime [2:swc-112#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "Storage, current address and balance still refer to the calling contract [2:swc-112#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "Calling into untrusted contracts is very dangerous, as the code at the target address can change any storage values of the caller and has full control over the caller's balance [2:swc-112#c2].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 1.62,
-      "generate_ms": 2.02,
+      "retrieve_ms": 2.07,
+      "generate_ms": 3.11,
       "injection_flags": []
     },
     {
@@ -876,36 +942,39 @@
         "nssc-unchecked-external-call",
         "swc-133"
       ],
-      "answer": "# not-so-smart-contracts: Re-entrancy [2:nssc-reentrancy#c0] # not-so-smart-contracts: Re-entrancy A state variable is changed after a contract uses `call.value` [5:nssc-reentrancy#c1]. Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/reentrancy/README.md), licensed under the Apache License 2.0 [6:nssc-reentrancy#c4]. Implement controls so withdrawals can only be triggered by authorized parties or according to the specs of the smart contract system [4:swc-105#c2].",
+      "answer": "A state variable is changed after a contract uses call.value [5:nssc-reentrancy#c1]. A contract that holds a map of account balances allows users to call a withdraw function [1:nssc-reentrancy#c2]. However, withdraw calls send which transfers control to the calling contract, but doesn't decrease their balance until after send has finished executing [1:nssc-reentrancy#c2]. The attacker can then repeatedly withdraw money that they do not have [1:nssc-reentrancy#c2].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
-        "nssc-reentrancy#c0",
         "nssc-reentrancy#c1",
-        "nssc-reentrancy#c4",
-        "swc-105#c2"
+        "nssc-reentrancy#c2"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "# not-so-smart-contracts: Re-entrancy [2:nssc-reentrancy#c0] # not-so-smart-contracts: Re-entrancy A state variable is changed after a contract uses `call.value` [5:nssc-reentrancy#c1].",
+          "claim": "A state variable is changed after a contract uses call.value [5:nssc-reentrancy#c1].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/reentrancy/README.md), licensed under the Apache License 2.0 [6:nssc-reentrancy#c4].",
+          "claim": "A contract that holds a map of account balances allows users to call a withdraw function [1:nssc-reentrancy#c2].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "Implement controls so withdrawals can only be triggered by authorized parties or according to the specs of the smart contract system [4:swc-105#c2].",
+          "claim": "However, withdraw calls send which transfers control to the calling contract, but doesn't decrease their balance until after send has finished executing [1:nssc-reentrancy#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "The attacker can then repeatedly withdraw money that they do not have [1:nssc-reentrancy#c2].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 2.45,
-      "generate_ms": 2.4,
+      "retrieve_ms": 3.07,
+      "generate_ms": 3.75,
       "injection_flags": []
     },
     {
@@ -943,31 +1012,39 @@
         "nssc-race-condition",
         "nssc-bad-randomness"
       ],
-      "answer": "# not-so-smart-contracts: Unprotected function Missing (or incorrectly used) modifier on a function allows an attacker to use sensitive functionality in the contract [1:nssc-unprotected-function#c1]. # not-so-smart-contracts: Unprotected function [2:nssc-unprotected-function#c0] # not-so-smart-contracts: Wrong Constructor Name [6:nssc-wrong-constructor-name#c0] # not-so-smart-contracts: Variable Shadowing [7:nssc-variable-shadowing#c0]",
+      "answer": "Missing (or incorrectly used) modifier on a function allows an attacker to use sensitive functionality in the contract [1:nssc-unprotected-function#c1]. A contract with a changeOwner function does not label it as private and therefore allows anyone to become the contract owner [1:nssc-unprotected-function#c1]. Always specify a modifier for functions [4:nssc-unprotected-function#c2]. An onlyOwner modifier is defined but not used, allowing anyone to become the owner [4:nssc-unprotected-function#c2]",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
         "nssc-unprotected-function#c1",
-        "nssc-unprotected-function#c0",
-        "nssc-wrong-constructor-name#c0",
-        "nssc-variable-shadowing#c0"
+        "nssc-unprotected-function#c2"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "# not-so-smart-contracts: Unprotected function Missing (or incorrectly used) modifier on a function allows an attacker to use sensitive functionality in the contract [1:nssc-unprotected-function#c1].",
+          "claim": "Missing (or incorrectly used) modifier on a function allows an attacker to use sensitive functionality in the contract [1:nssc-unprotected-function#c1].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "# not-so-smart-contracts: Unprotected function [2:nssc-unprotected-function#c0] # not-so-smart-contracts: Wrong Constructor Name [6:nssc-wrong-constructor-name#c0] # not-so-smart-contracts: Variable Shadowing [7:nssc-variable-shadowing#c0]",
+          "claim": "A contract with a changeOwner function does not label it as private and therefore allows anyone to become the contract owner [1:nssc-unprotected-function#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "Always specify a modifier for functions [4:nssc-unprotected-function#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "An onlyOwner modifier is defined but not used, allowing anyone to become the owner [4:nssc-unprotected-function#c2]",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 1.74,
-      "generate_ms": 1.75,
+      "retrieve_ms": 2.7,
+      "generate_ms": 2.65,
       "injection_flags": []
     },
     {
@@ -1007,36 +1084,34 @@
         "nssc-race-condition",
         "nssc-reentrancy"
       ],
-      "answer": "# not-so-smart-contracts: Race Condition [1:nssc-race-condition#c0] # not-so-smart-contracts: Race Condition There is a gap between the creation of a transaction and the moment it is accepted in the blockchain [8:nssc-race-condition#c1]. Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/race_condition/README.md), licensed under the Apache License 2.0 [9:nssc-race-condition#c4]. # not-so-smart-contracts: Integer Overflow It is possible to cause `add` and `sub` to overflow (or underflow) on any type of integer in Solidity [5:nssc-integer-overflow#c1].",
+      "answer": "Both insecure and secure versions of the auction contract mentioned above - Bulk refund functionality that is suceptible to DoS, and a secure version [2:nssc-denial-of-service#c3] If iterating over a dynamically sized data structure, be able to handle the case where the function takes multiple blocks to execute [2:nssc-denial-of-service#c3]. One strategy for this is storing iterator in a private variable and using while loop that exists when gas drops below certain threshold [2:nssc-denial-of-service#c3]. Auction contract where frontrunner must be reimbursed when they are outbid [7:nssc-denial-of-service#c2].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
-        "nssc-race-condition#c0",
-        "nssc-race-condition#c1",
-        "nssc-race-condition#c4",
-        "nssc-integer-overflow#c1"
+        "nssc-denial-of-service#c3",
+        "nssc-denial-of-service#c2"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "# not-so-smart-contracts: Race Condition [1:nssc-race-condition#c0] # not-so-smart-contracts: Race Condition There is a gap between the creation of a transaction and the moment it is accepted in the blockchain [8:nssc-race-condition#c1].",
+          "claim": "Both insecure and secure versions of the auction contract mentioned above - Bulk refund functionality that is suceptible to DoS, and a secure version [2:nssc-denial-of-service#c3] If iterating over a dynamically sized data structure, be able to handle the case where the function takes multiple blocks to execute [2:nssc-denial-of-service#c3].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/race_condition/README.md), licensed under the Apache License 2.0 [9:nssc-race-condition#c4].",
+          "claim": "One strategy for this is storing iterator in a private variable and using while loop that exists when gas drops below certain threshold [2:nssc-denial-of-service#c3].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "# not-so-smart-contracts: Integer Overflow It is possible to cause `add` and `sub` to overflow (or underflow) on any type of integer in Solidity [5:nssc-integer-overflow#c1].",
+          "claim": "Auction contract where frontrunner must be reimbursed when they are outbid [7:nssc-denial-of-service#c2].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 2.63,
-      "generate_ms": 2.01,
+      "retrieve_ms": 7.3,
+      "generate_ms": 10.46,
       "injection_flags": []
     },
     {
@@ -1075,36 +1150,39 @@
         "swc-129",
         "swc-120"
       ],
-      "answer": "# SWC-117: Signature Malleability [5:swc-117#c0] The `ecrecover` function is susceptible to signature malleability (see also SWC-117) [8:swc-121#c2]. The weakness can be avoided by performing pre-condition checks on any math operation or using a vetted library for arithmetic calculations such as SafeMath developed by OpenZeppelin [1:swc-129#c2]. ## Remediation The weakness can be avoided by performing pre-condition checks on any math operation or using a vetted library for arithmetic calculations such as SafeMath developed by OpenZeppelin [4:swc-129#c3].",
+      "answer": "The weakness can be avoided by performing pre-condition checks on any math operation or using a vetted library for arithmetic calculations such as SafeMath developed by OpenZeppelin [1:swc-129#c2]. The EVM specification defines several so-called \u2018precompiled\u2019 contracts one of them being ecrecover which executes the elliptic curve public key recovery [2:swc-117#c1]. A malicious user can slightly modify the three values v, r and s to create other valid signatures [2:swc-117#c1]. A system that performs signature verification on contract level might be susceptible to attacks if the signature is part of the signed message hash [2:swc-117#c1].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
-        "swc-117#c0",
-        "swc-121#c2",
         "swc-129#c2",
-        "swc-129#c3"
+        "swc-117#c1"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
-        {
-          "claim": "# SWC-117: Signature Malleability [5:swc-117#c0] The `ecrecover` function is susceptible to signature malleability (see also SWC-117) [8:swc-121#c2].",
-          "ok": true,
-          "reason": "ok"
-        },
         {
           "claim": "The weakness can be avoided by performing pre-condition checks on any math operation or using a vetted library for arithmetic calculations such as SafeMath developed by OpenZeppelin [1:swc-129#c2].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "## Remediation The weakness can be avoided by performing pre-condition checks on any math operation or using a vetted library for arithmetic calculations such as SafeMath developed by OpenZeppelin [4:swc-129#c3].",
+          "claim": "The EVM specification defines several so-called \u2018precompiled\u2019 contracts one of them being ecrecover which executes the elliptic curve public key recovery [2:swc-117#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "A malicious user can slightly modify the three values v, r and s to create other valid signatures [2:swc-117#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "A system that performs signature verification on contract level might be susceptible to attacks if the signature is part of the signed message hash [2:swc-117#c1].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 1.86,
-      "generate_ms": 2.23,
+      "retrieve_ms": 6.23,
+      "generate_ms": 3.74,
       "injection_flags": []
     },
     {
@@ -1146,31 +1224,34 @@
         "nssc-wrong-constructor-name",
         "nssc-reentrancy"
       ],
-      "answer": "# not-so-smart-contracts: Variable Shadowing [2:nssc-variable-shadowing#c0] # not-so-smart-contracts: Variable Shadowing Variable shadowing occurs when a variable declared within a certain scope (decision block, method, or inner class) has the same name as a variable declared in an outer scope [8:nssc-variable-shadowing#c1]. # not-so-smart-contracts: Wrong Constructor Name [1:nssc-wrong-constructor-name#c0] # not-so-smart-contracts: Contracts can be forced to receive ether [4:nssc-forced-ether-reception#c0]",
+      "answer": "Variable shadowing occurs when a variable declared within a certain scope (decision block, method, or inner class) has the same name as a variable declared in an outer scope [8:nssc-variable-shadowing#c1]. This depends a lot on the code of the contract itself [3:nssc-variable-shadowing#c2]. For instance, in the this example, variable shadowing prevents the owner of contract C from performing self destruct [3:nssc-variable-shadowing#c2] The solidity compiler has some checks to emit warnings when it detects this kind of issue, but it has known examples where it fails [3:nssc-variable-shadowing#c2].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
-        "nssc-variable-shadowing#c0",
         "nssc-variable-shadowing#c1",
-        "nssc-wrong-constructor-name#c0",
-        "nssc-forced-ether-reception#c0"
+        "nssc-variable-shadowing#c2"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "# not-so-smart-contracts: Variable Shadowing [2:nssc-variable-shadowing#c0] # not-so-smart-contracts: Variable Shadowing Variable shadowing occurs when a variable declared within a certain scope (decision block, method, or inner class) has the same name as a variable declared in an outer scope [8:nssc-variable-shadowing#c1].",
+          "claim": "Variable shadowing occurs when a variable declared within a certain scope (decision block, method, or inner class) has the same name as a variable declared in an outer scope [8:nssc-variable-shadowing#c1].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "# not-so-smart-contracts: Wrong Constructor Name [1:nssc-wrong-constructor-name#c0] # not-so-smart-contracts: Contracts can be forced to receive ether [4:nssc-forced-ether-reception#c0]",
+          "claim": "This depends a lot on the code of the contract itself [3:nssc-variable-shadowing#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "For instance, in the this example, variable shadowing prevents the owner of contract C from performing self destruct [3:nssc-variable-shadowing#c2] The solidity compiler has some checks to emit warnings when it detects this kind of issue, but it has known examples where it fails [3:nssc-variable-shadowing#c2].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 1.97,
-      "generate_ms": 1.44,
+      "retrieve_ms": 5.51,
+      "generate_ms": 3.1,
       "injection_flags": []
     },
     {
@@ -1210,29 +1291,39 @@
         "swc-134",
         "swc-116"
       ],
-      "answer": "# SWC-128: DoS With Block Gas Limit ## Relationships - [CWE-400: Uncontrolled Resource Consumption](https://cwe.mitre.org/data/definitions/400.html) - EEA EthTrust Security Levels: - [**[Q] Manage Gas Usage Increases**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-3-enough-gas) [3:swc-128#c1] # SWC-128: DoS With Block Gas Limit [4:swc-128#c0] When smart contracts are deployed or functions inside them are called, the execution of these actions always requires a certain amount of gas, based of how much computation is needed to complete them [3:swc-128#c1]. - [**[Q] Manage Gas Usage Increases**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-3-enough-gas) [4:swc-128#c0]",
+      "answer": "When smart contracts are deployed or functions inside them are called, the execution of these actions always requires a certain amount of gas, based of how much computation is needed to complete them [3:swc-128#c1]. The Ethereum network specifies a block gas limit and the sum of all transactions included in a block can not exceed the threshold [2:swc-128#c2]. Programming patterns that are harmless in centralized applications can lead to Denial of Service conditions in smart contracts when the cost of executing a function exceeds the block gas limit [2:swc-128#c2]. Modifying an array of unknown size, that increases in size over time, can lead to such a Denial of Service condition [2:swc-128#c2].",
       "did_refuse": false,
       "generator": "extractive",
       "used_chunk_ids": [
         "swc-128#c1",
-        "swc-128#c0"
+        "swc-128#c2"
       ],
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [
         {
-          "claim": "# SWC-128: DoS With Block Gas Limit ## Relationships - [CWE-400: Uncontrolled Resource Consumption](https://cwe.mitre.org/data/definitions/400.html) - EEA EthTrust Security Levels: - [**[Q] Manage Gas Usage Increases**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-3-enough-gas) [3:swc-128#c1] # SWC-128: DoS With Block Gas Limit [4:swc-128#c0] When smart contracts are deployed or functions inside them are called, the execution of these actions always requires a certain amount of gas, based of how much computation is needed to complete them [3:swc-128#c1].",
+          "claim": "When smart contracts are deployed or functions inside them are called, the execution of these actions always requires a certain amount of gas, based of how much computation is needed to complete them [3:swc-128#c1].",
           "ok": true,
           "reason": "ok"
         },
         {
-          "claim": "- [**[Q] Manage Gas Usage Increases**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-3-enough-gas) [4:swc-128#c0]",
+          "claim": "The Ethereum network specifies a block gas limit and the sum of all transactions included in a block can not exceed the threshold [2:swc-128#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "Programming patterns that are harmless in centralized applications can lead to Denial of Service conditions in smart contracts when the cost of executing a function exceeds the block gas limit [2:swc-128#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "Modifying an array of unknown size, that increases in size over time, can lead to such a Denial of Service condition [2:swc-128#c2].",
           "ok": true,
           "reason": "ok"
         }
       ],
-      "retrieve_ms": 1.86,
-      "generate_ms": 3.1,
+      "retrieve_ms": 6.51,
+      "generate_ms": 5.62,
       "injection_flags": []
     },
     {
@@ -1273,8 +1364,8 @@
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [],
-      "retrieve_ms": 1.92,
-      "generate_ms": 4.28,
+      "retrieve_ms": 2.87,
+      "generate_ms": 8.25,
       "injection_flags": []
     },
     {
@@ -1315,8 +1406,8 @@
       "citation_accuracy": 1.0,
       "faithfulness": 1.0,
       "citation_detail": [],
-      "retrieve_ms": 2.41,
-      "generate_ms": 2.55,
+      "retrieve_ms": 4.31,
+      "generate_ms": 3.59,
       "injection_flags": []
     }
   ]
