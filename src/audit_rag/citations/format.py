@@ -1,4 +1,4 @@
-"""Citation formatting for search hits (generation comes in a later milestone)."""
+"""Citation formatting for search hits and generated answers."""
 
 from __future__ import annotations
 

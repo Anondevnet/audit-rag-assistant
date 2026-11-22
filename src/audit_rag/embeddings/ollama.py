@@ -21,7 +21,7 @@ class OllamaEmbedder(Embedder):
         self,
         model: str | None = None,
         host: str | None = None,
-        timeout: float = 30.0,
+        timeout: float = 120.0,
     ) -> None:
         self.model = model or os.environ.get("OLLAMA_EMBED_MODEL") or "nomic-embed-text"
         self.host = (host or os.environ.get("OLLAMA_HOST") or "http://127.0.0.1:11434").rstrip("/")
@@ -40,6 +40,16 @@ class OllamaEmbedder(Embedder):
     def embed_texts(self, texts: list[str], *, prefix: str = "") -> np.ndarray:
         if not texts:
             return np.zeros((0, self.dim), dtype=np.float32)
+        batch_size = max(1, int(os.environ.get("OLLAMA_EMBED_BATCH") or 8))
+        batches = [
+            self._embed_batch(texts[i : i + batch_size], prefix=prefix)
+            for i in range(0, len(texts), batch_size)
+        ]
+        arr = np.vstack(batches)
+        self.dim = int(arr.shape[1])
+        return arr
+
+    def _embed_batch(self, texts: list[str], *, prefix: str) -> np.ndarray:
         payload = json.dumps({"model": self.model, "input": [prefix + t for t in texts]}).encode()
         req = urllib.request.Request(
             self.host + "/api/embed",
@@ -47,13 +57,16 @@ class OllamaEmbedder(Embedder):
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-            data = json.loads(resp.read().decode())
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                data = json.loads(resp.read().decode())
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")[:500]
+            raise RuntimeError(f"Ollama embed HTTP {exc.code}: {body}") from exc
         embeddings = data.get("embeddings")
         if not embeddings:
             raise RuntimeError(f"Ollama returned no embeddings: {data!r}")
         arr = np.asarray(embeddings, dtype=np.float32)
-        self.dim = int(arr.shape[1])
         norms = np.linalg.norm(arr, axis=1, keepdims=True)
         norms = np.maximum(norms, 1e-12)
         return arr / norms

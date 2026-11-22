@@ -12,6 +12,7 @@ jobs:
     env:
       AUDIT_RAG_EMBEDDER: hashing
       AUDIT_RAG_RERANKER: token
+      AUDIT_RAG_GENERATOR: extractive
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -21,7 +22,18 @@ jobs:
         run: pip install -e ".[dev]"
       - name: Run tests
         run: pytest
-      - name: Smoke ingest and search
+      - name: Smoke ingest, search, and ask
         run: |
           python -m audit_rag ingest --corpus data/corpus --index /tmp/audit-ci.db
           python -m audit_rag search "reentrancy checks-effects-interactions" --index /tmp/audit-ci.db --k 5
+          python -m audit_rag ask "How do I prevent a reentrancy attack?" --index /tmp/audit-ci.db --k 5
+          python -m audit_rag ask "What high-severity findings were reported in a 2024 Uniswap audit contest on Code4rena?" --index /tmp/audit-ci.db --k 5
+      - name: Run eval harness
+        run: python scripts/eval.py --k 10
+      - name: Upload eval report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: evals/reports/
+          if-no-files-found: warn

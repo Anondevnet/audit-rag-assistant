@@ -1,0 +1,1345 @@
+{
+  "schema": "audit-rag-eval/v1",
+  "method": {
+    "embedder": "hashing",
+    "generator": "extractive",
+    "retriever": "hybrid BM25+sqlite-vec RRF, token rerank unless AUDIT_RAG_RERANKER is set",
+    "recall_at_k_all": "Fraction of answerable questions where every gold chunk_id appears in the top k retrieved chunks.",
+    "mean_recall_at_k": "Macro-average of |gold \u2229 retrieved@k| / |gold| on answerable questions.",
+    "mrr": "Mean reciprocal rank of the first gold chunk in the retrieved list, on answerable questions.",
+    "doc_recall_at_k": "Fraction of answerable questions where at least one gold doc_id appears in the top k.",
+    "citation_accuracy": "On non-refusal answers, each claim sentence must have a [rank:chunk_id] marker, the chunk must be in the retrieved set, and at least half of the claim's content tokens (min 3, or all if fewer) must appear in the cited chunk. Refusals with no citations score 1.0.",
+    "faithfulness": "Same lexical support test as citation accuracy. This is not an LLM-as-judge score and can miss valid paraphrases.",
+    "refusal_accuracy": "(true refusals + true answers) / N, using must_refuse from the golden set.",
+    "refusal_rule": "The extractive generator also refuses when a proper-noun or identifier token from the question is missing from the retrieved chunks, or when a question asks for an exact dollar/amount loss and the candidate answer has no currency figure. This is lexical, not an LLM judge."
+  },
+  "settings": {
+    "k": 10,
+    "golden": "evals/golden_seed.jsonl",
+    "document_count": 49,
+    "chunk_count": 468,
+    "question_count": 20,
+    "answerable_count": 18
+  },
+  "metrics": {
+    "recall@5_all": 0.1667,
+    "mean_recall@5": 0.4231,
+    "mrr@5": 0.513,
+    "doc_recall@5": 1.0,
+    "recall@10_all": 0.4444,
+    "mean_recall@10": 0.7324,
+    "mrr@10": 0.5464,
+    "doc_recall@10": 1.0,
+    "citation_accuracy": 1.0,
+    "faithfulness": 1.0,
+    "refusal_accuracy": 1.0,
+    "refusal_breakdown": {
+      "true_refuse": 2,
+      "false_refuse": 0,
+      "true_answer": 18,
+      "false_answer": 0,
+      "n": 20
+    },
+    "n_answerable": 18,
+    "n_non_refusal_answers": 18,
+    "elapsed_ms": 76.3
+  },
+  "records": [
+    {
+      "id": "q01",
+      "question": "What is a reentrancy attack, and what remediations does the SWC Registry recommend?",
+      "question_type": "fact_lookup",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "swc-107#c2",
+        "swc-107#c3",
+        "swc-107#c4"
+      ],
+      "gold_doc_ids": [
+        "swc-107"
+      ],
+      "retrieved_chunk_ids": [
+        "nssc-unprotected-function#c2",
+        "swc-101#c4",
+        "swc-107#c2",
+        "swc-100#c3",
+        "nssc-unprotected-function#c1",
+        "swc-126#c5",
+        "swc-112#c9",
+        "swc-100#c4",
+        "swc-107#c3",
+        "swc-126#c4"
+      ],
+      "retrieved_doc_ids": [
+        "nssc-unprotected-function",
+        "swc-101",
+        "swc-107",
+        "swc-100",
+        "nssc-unprotected-function",
+        "swc-126",
+        "swc-112",
+        "swc-100",
+        "swc-107",
+        "swc-126"
+      ],
+      "answer": "## Remediation It is recommended to use vetted safe math libraries for arithmetic operations consistently throughout the smart contract system [2:swc-101#c4]. Adapted from SWC Registry (https://github.com/SmartContractSecurity/SWC-registry/blob/1b6227074ecd180b374e4844153afdda0332f979/entries/docs/SWC-112.md), MIT licensed [7:swc-112#c9]. ## Attack Scenario A contract with a `changeOwner` function does not label it as `private` and therefore allows anyone to become the contract owner [1:nssc-unprotected-function#c2]. recursive call attack), a malicious contract calls back into the calling contract before the first invocation of the function is finished [3:swc-107#c2].",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "swc-101#c4",
+        "swc-112#c9",
+        "nssc-unprotected-function#c2",
+        "swc-107#c2"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "## Remediation It is recommended to use vetted safe math libraries for arithmetic operations consistently throughout the smart contract system [2:swc-101#c4].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "Adapted from SWC Registry (https://github.com/SmartContractSecurity/SWC-registry/blob/1b6227074ecd180b374e4844153afdda0332f979/entries/docs/SWC-112.md), MIT licensed [7:swc-112#c9].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Attack Scenario A contract with a `changeOwner` function does not label it as `private` and therefore allows anyone to become the contract owner [1:nssc-unprotected-function#c2].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "recursive call attack), a malicious contract calls back into the calling contract before the first invocation of the function is finished [3:swc-107#c2].",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 3.18,
+      "generate_ms": 1.67,
+      "injection_flags": []
+    },
+    {
+      "id": "q02",
+      "question": "How does the not-so-smart-contracts re-entrancy write-up describe the vulnerable withdraw pattern?",
+      "question_type": "fact_lookup",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "nssc-reentrancy#c0",
+        "nssc-reentrancy#c1",
+        "nssc-reentrancy#c2"
+      ],
+      "gold_doc_ids": [
+        "nssc-reentrancy"
+      ],
+      "retrieved_chunk_ids": [
+        "nssc-reentrancy#c0",
+        "nssc-unprotected-function#c2",
+        "nssc-reentrancy#c3",
+        "nssc-reentrancy#c2",
+        "nssc-reentrancy#c4",
+        "nssc-wrong-constructor-name#c0",
+        "nssc-reentrancy#c1",
+        "nssc-unprotected-function#c1",
+        "nssc-reentrancy#c5",
+        "nssc-forced-ether-reception#c3"
+      ],
+      "retrieved_doc_ids": [
+        "nssc-reentrancy",
+        "nssc-unprotected-function",
+        "nssc-reentrancy",
+        "nssc-reentrancy",
+        "nssc-reentrancy",
+        "nssc-wrong-constructor-name",
+        "nssc-reentrancy",
+        "nssc-unprotected-function",
+        "nssc-reentrancy",
+        "nssc-forced-ether-reception"
+      ],
+      "answer": "# not-so-smart-contracts: Re-entrancy [1:nssc-reentrancy#c0] # not-so-smart-contracts: Re-entrancy A state variable is changed after a contract uses `call.value` [7:nssc-reentrancy#c1]. Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/reentrancy/README.md), licensed under the Apache License 2.0 [9:nssc-reentrancy#c5]. # not-so-smart-contracts: Wrong Constructor Name [6:nssc-wrong-constructor-name#c0]",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "nssc-reentrancy#c0",
+        "nssc-reentrancy#c1",
+        "nssc-reentrancy#c5",
+        "nssc-wrong-constructor-name#c0"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "# not-so-smart-contracts: Re-entrancy [1:nssc-reentrancy#c0] # not-so-smart-contracts: Re-entrancy A state variable is changed after a contract uses `call.value` [7:nssc-reentrancy#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/reentrancy/README.md), licensed under the Apache License 2.0 [9:nssc-reentrancy#c5].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "# not-so-smart-contracts: Wrong Constructor Name [6:nssc-wrong-constructor-name#c0]",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 2.35,
+      "generate_ms": 1.46,
+      "injection_flags": []
+    },
+    {
+      "id": "q03",
+      "question": "Why can omitting a Solidity function visibility specifier be a security issue?",
+      "question_type": "fact_lookup",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "swc-100#c2",
+        "swc-100#c3",
+        "swc-100#c4"
+      ],
+      "gold_doc_ids": [
+        "swc-100"
+      ],
+      "retrieved_chunk_ids": [
+        "swc-100#c4",
+        "swc-100#c5",
+        "swc-108#c4",
+        "swc-100#c6",
+        "swc-119#c4",
+        "swc-100#c0",
+        "swc-119#c5",
+        "swc-100#c7",
+        "swc-100#c8",
+        "swc-115#c4"
+      ],
+      "retrieved_doc_ids": [
+        "swc-100",
+        "swc-100",
+        "swc-108",
+        "swc-100",
+        "swc-119",
+        "swc-100",
+        "swc-119",
+        "swc-100",
+        "swc-100",
+        "swc-115"
+      ],
+      "answer": "- [SigmaPrime - Visibility](https://github.com/sigp/solidity-security-blog#visibility) [1:swc-100#c4] ## References - [Ethereum Smart Contract Best Practices - Visibility](https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/visibility/) - [SigmaPrime - Visibility](https://github.com/sigp/solidity-security-blog#visibility) [2:swc-100#c5] ## References - [Issue on Solidity's Github - Shadowing of inherited state variables should be an error (override keyword)](https://github.com/ethereum/solidity/issues/2563) - [Issue on Solidity's Github - Warn about shadowing state variables](https://github.com/ethereum/solidity/issues/973) EthTrust Security Levels: - [**[Q] Implement as Documented**](https://entethalliance.org/specs/ethtrust-sl/#req-3-implement-as-documented) [7:swc-119#c5] - [SigmaPrime - Visibility](https://github.com/sigp/solidity-security-blog#tx-origin) [10:swc-115#c4]",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "swc-100#c4",
+        "swc-100#c5",
+        "swc-119#c5",
+        "swc-115#c4"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "- [SigmaPrime - Visibility](https://github.com/sigp/solidity-security-blog#visibility) [1:swc-100#c4] ## References - [Ethereum Smart Contract Best Practices - Visibility](https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/visibility/) - [SigmaPrime - Visibility](https://github.com/sigp/solidity-security-blog#visibility) [2:swc-100#c5] ## References - [Issue on Solidity's Github - Shadowing of inherited state variables should be an error (override keyword)](https://github.com/ethereum/solidity/issues/2563) - [Issue on Solidity's Github - Warn about shadowing state variables](https://github.com/ethereum/solidity/issues/973) EthTrust Security Levels: - [**[Q] Implement as Documented**](https://entethalliance.org/specs/ethtrust-sl/#req-3-implement-as-documented) [7:swc-119#c5] - [SigmaPrime - Visibility](https://github.com/sigp/solidity-security-blog#tx-origin) [10:swc-115#c4]",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 1.77,
+      "generate_ms": 1.45,
+      "injection_flags": []
+    },
+    {
+      "id": "q04",
+      "question": "What is an integer overflow or underflow in the sense used by SWC-101?",
+      "question_type": "fact_lookup",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "swc-101#c2",
+        "swc-101#c3"
+      ],
+      "gold_doc_ids": [
+        "swc-101"
+      ],
+      "retrieved_chunk_ids": [
+        "swc-101#c0",
+        "swc-101#c4",
+        "nssc-integer-overflow#c0",
+        "swc-101#c5",
+        "swc-101#c3",
+        "nssc-integer-overflow#c1",
+        "swc-101#c2",
+        "swc-101#c20",
+        "swc-101#c12",
+        "swc-101#c19"
+      ],
+      "retrieved_doc_ids": [
+        "swc-101",
+        "swc-101",
+        "nssc-integer-overflow",
+        "swc-101",
+        "swc-101",
+        "nssc-integer-overflow",
+        "swc-101",
+        "swc-101",
+        "swc-101",
+        "swc-101"
+      ],
+      "answer": "# SWC-101: Integer Overflow and Underflow [1:swc-101#c0] It is possible to cause `add` and `sub` to overflow (or underflow) on any type of integer in Solidity [3:nssc-integer-overflow#c0]. # not-so-smart-contracts: Integer Overflow It is possible to cause `add` and `sub` to overflow (or underflow) on any type of integer in Solidity [6:nssc-integer-overflow#c1]. ## Description An overflow/underflow happens when an arithmetic operation reaches the maximum or minimum size of a type [5:swc-101#c3].",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "swc-101#c0",
+        "nssc-integer-overflow#c0",
+        "nssc-integer-overflow#c1",
+        "swc-101#c3"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "# SWC-101: Integer Overflow and Underflow [1:swc-101#c0] It is possible to cause `add` and `sub` to overflow (or underflow) on any type of integer in Solidity [3:nssc-integer-overflow#c0].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "# not-so-smart-contracts: Integer Overflow It is possible to cause `add` and `sub` to overflow (or underflow) on any type of integer in Solidity [6:nssc-integer-overflow#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Description An overflow/underflow happens when an arithmetic operation reaches the maximum or minimum size of a type [5:swc-101#c3].",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 1.75,
+      "generate_ms": 1.23,
+      "injection_flags": []
+    },
+    {
+      "id": "q05",
+      "question": "Why is authorization through tx.origin considered unsafe?",
+      "question_type": "fact_lookup",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "swc-115#c2",
+        "swc-115#c3"
+      ],
+      "gold_doc_ids": [
+        "swc-115"
+      ],
+      "retrieved_chunk_ids": [
+        "swc-115#c0",
+        "swc-115#c3",
+        "swc-115#c5",
+        "swc-115#c6",
+        "swc-115#c1",
+        "swc-115#c4",
+        "swc-115#c2",
+        "swc-115#c8",
+        "swc-115#c7",
+        "nssc-integer-overflow#c1"
+      ],
+      "retrieved_doc_ids": [
+        "swc-115",
+        "swc-115",
+        "swc-115",
+        "swc-115",
+        "swc-115",
+        "swc-115",
+        "swc-115",
+        "swc-115",
+        "swc-115",
+        "nssc-integer-overflow"
+      ],
+      "answer": "# SWC-115: Authorization through tx.origin [1:swc-115#c0] A call could be made to the vulnerable contract that passes the authorization check since `tx.origin` returns the original sender of the transaction which in this case is the authorized account [2:swc-115#c3]. ## Remediation `tx.origin` should not be used for authorization [6:swc-115#c4]. ## References - [Solidity Documentation - tx.origin](https://solidity.readthedocs.io/en/develop/security-considerations.html#tx-origin) - [Ethereum Smart Contract Best Practices - Avoid using tx.origin](https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/tx-origin/) - [SigmaPrime - Visibility](https://github.com/sigp/solidity-security-blog#tx-origin) [3:swc-115#c5]",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "swc-115#c0",
+        "swc-115#c3",
+        "swc-115#c4",
+        "swc-115#c5"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "# SWC-115: Authorization through tx.origin [1:swc-115#c0] A call could be made to the vulnerable contract that passes the authorization check since `tx.origin` returns the original sender of the transaction which in this case is the authorized account [2:swc-115#c3].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Remediation `tx.origin` should not be used for authorization [6:swc-115#c4].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## References - [Solidity Documentation - tx.origin](https://solidity.readthedocs.io/en/develop/security-considerations.html#tx-origin) - [Ethereum Smart Contract Best Practices - Avoid using tx.origin](https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/tx-origin/) - [SigmaPrime - Visibility](https://github.com/sigp/solidity-security-blog#tx-origin) [3:swc-115#c5]",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 1.49,
+      "generate_ms": 1.37,
+      "injection_flags": []
+    },
+    {
+      "id": "q06",
+      "question": "What problem does a floating pragma introduce according to SWC-103?",
+      "question_type": "remediation",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "swc-103#c2",
+        "swc-103#c3",
+        "swc-103#c4"
+      ],
+      "gold_doc_ids": [
+        "swc-103"
+      ],
+      "retrieved_chunk_ids": [
+        "swc-103#c0",
+        "swc-103#c6",
+        "swc-103#c8",
+        "swc-103#c7",
+        "swc-103#c5",
+        "swc-103#c3",
+        "swc-124#c1",
+        "swc-103#c9",
+        "swc-103#c4",
+        "swc-103#c10"
+      ],
+      "retrieved_doc_ids": [
+        "swc-103",
+        "swc-103",
+        "swc-103",
+        "swc-103",
+        "swc-103",
+        "swc-103",
+        "swc-124",
+        "swc-103",
+        "swc-103",
+        "swc-103"
+      ],
+      "answer": "# SWC-103: Floating Pragma [1:swc-103#c0] ### floating_pragma.sol [2:swc-103#c6] ### floating_pragma_fixed.sol [3:swc-103#c8] Locking the pragma helps to ensure that contracts do not accidentally get deployed using, for example, an outdated compiler version that might introduce bugs that affect the contract system negatively [6:swc-103#c3].",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "swc-103#c0",
+        "swc-103#c6",
+        "swc-103#c8",
+        "swc-103#c3"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "# SWC-103: Floating Pragma [1:swc-103#c0] ### floating_pragma.sol [2:swc-103#c6] ### floating_pragma_fixed.sol [3:swc-103#c8] Locking the pragma helps to ensure that contracts do not accidentally get deployed using, for example, an outdated compiler version that might introduce bugs that affect the contract system negatively [6:swc-103#c3].",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 1.5,
+      "generate_ms": 0.88,
+      "injection_flags": []
+    },
+    {
+      "id": "q07",
+      "question": "What can go wrong if a low-level call's return value is not checked?",
+      "question_type": "fact_lookup",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "swc-104#c2",
+        "swc-104#c3",
+        "swc-104#c4"
+      ],
+      "gold_doc_ids": [
+        "swc-104"
+      ],
+      "retrieved_chunk_ids": [
+        "swc-104#c3",
+        "swc-104#c4",
+        "swc-104#c2",
+        "nssc-wrong-constructor-name#c1",
+        "nssc-wrong-constructor-name#c2",
+        "swc-114#c4",
+        "nssc-honeypots#c4",
+        "swc-112#c3",
+        "swc-116#c7",
+        "swc-124#c2"
+      ],
+      "retrieved_doc_ids": [
+        "swc-104",
+        "swc-104",
+        "swc-104",
+        "nssc-wrong-constructor-name",
+        "nssc-wrong-constructor-name",
+        "swc-114",
+        "nssc-honeypots",
+        "swc-112",
+        "swc-116",
+        "swc-124"
+      ],
+      "answer": "## Description The return value of a message call is not checked [1:swc-104#c3]. ## Remediation If you choose to use low-level call methods, make sure to handle the possibility that the call will fail by checking the return value [2:swc-104#c4]. ## Relationships - [CWE-252: Unchecked Return Value](https://cwe.mitre.org/data/definitions/252.html) - EthTrust Security Levels: - [**[M] Handle External Call Returns**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-2-handle-return) [3:swc-104#c2] It takes advantage of the low-level call in the function `CashOut()` by `msg.sender.call.value(_am)())` [7:nssc-honeypots#c4].",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "swc-104#c3",
+        "swc-104#c4",
+        "swc-104#c2",
+        "nssc-honeypots#c4"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "## Description The return value of a message call is not checked [1:swc-104#c3].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Remediation If you choose to use low-level call methods, make sure to handle the possibility that the call will fail by checking the return value [2:swc-104#c4].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Relationships - [CWE-252: Unchecked Return Value](https://cwe.mitre.org/data/definitions/252.html) - EthTrust Security Levels: - [**[M] Handle External Call Returns**](https://entethalliance.github.io/eta-registry/security-levels-spec.html#req-2-handle-return) [3:swc-104#c2] It takes advantage of the low-level call in the function `CashOut()` by `msg.sender.call.value(_am)())` [7:nssc-honeypots#c4].",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 2.42,
+      "generate_ms": 2.68,
+      "injection_flags": []
+    },
+    {
+      "id": "q08",
+      "question": "What is an unprotected Ether withdrawal?",
+      "question_type": "fact_lookup",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "swc-105#c2",
+        "swc-105#c3"
+      ],
+      "gold_doc_ids": [
+        "swc-105"
+      ],
+      "retrieved_chunk_ids": [
+        "swc-105#c0",
+        "swc-105#c5",
+        "swc-105#c4",
+        "swc-105#c3",
+        "swc-105#c1",
+        "swc-105#c10",
+        "swc-105#c2",
+        "swc-105#c11",
+        "swc-105#c13",
+        "swc-105#c14"
+      ],
+      "retrieved_doc_ids": [
+        "swc-105",
+        "swc-105",
+        "swc-105",
+        "swc-105",
+        "swc-105",
+        "swc-105",
+        "swc-105",
+        "swc-105",
+        "swc-105",
+        "swc-105"
+      ],
+      "answer": "# SWC-105: Unprotected Ether Withdrawal [1:swc-105#c0] ## References - [Rubixi smart contract](https://etherscan.io/address/0xe82719202e5965Cf5D9B6673B7503a3b92DE20be#code) [2:swc-105#c5] ## Remediation Implement controls so withdrawals can only be triggered by authorized parties or according to the specs of the smart contract system [3:swc-105#c4]. ## Description Due to missing or insufficient access controls, malicious parties can withdraw some or all Ether from the contract account [4:swc-105#c3].",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "swc-105#c0",
+        "swc-105#c5",
+        "swc-105#c4",
+        "swc-105#c3"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "# SWC-105: Unprotected Ether Withdrawal [1:swc-105#c0] ## References - [Rubixi smart contract](https://etherscan.io/address/0xe82719202e5965Cf5D9B6673B7503a3b92DE20be#code) [2:swc-105#c5] ## Remediation Implement controls so withdrawals can only be triggered by authorized parties or according to the specs of the smart contract system [3:swc-105#c4].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Description Due to missing or insufficient access controls, malicious parties can withdraw some or all Ether from the contract account [4:swc-105#c3].",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 1.54,
+      "generate_ms": 1.76,
+      "injection_flags": []
+    },
+    {
+      "id": "q09",
+      "question": "According to not-so-smart-contracts, can a contract block forced Ether reception, and what should authors do instead?",
+      "question_type": "remediation",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "nssc-forced-ether-reception#c3",
+        "nssc-forced-ether-reception#c4"
+      ],
+      "gold_doc_ids": [
+        "nssc-forced-ether-reception"
+      ],
+      "retrieved_chunk_ids": [
+        "nssc-forced-ether-reception#c4",
+        "nssc-forced-ether-reception#c5",
+        "nssc-forced-ether-reception#c3",
+        "nssc-forced-ether-reception#c0",
+        "swc-105#c4",
+        "nssc-forced-ether-reception#c2",
+        "nssc-forced-ether-reception#c1",
+        "nssc-forced-ether-reception#c6",
+        "nssc-unprotected-function#c1",
+        "swc-130#c3"
+      ],
+      "retrieved_doc_ids": [
+        "nssc-forced-ether-reception",
+        "nssc-forced-ether-reception",
+        "nssc-forced-ether-reception",
+        "nssc-forced-ether-reception",
+        "swc-105",
+        "nssc-forced-ether-reception",
+        "nssc-forced-ether-reception",
+        "nssc-forced-ether-reception",
+        "nssc-unprotected-function",
+        "swc-130"
+      ],
+      "answer": "Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/forced_ether_reception/README.md), licensed under the Apache License 2.0 [8:nssc-forced-ether-reception#c6]. # not-so-smart-contracts: Contracts can be forced to receive ether [4:nssc-forced-ether-reception#c0] # not-so-smart-contracts: Contracts can be forced to receive ether In certain circunstances, contracts can be forced to receive ether without triggering any code [7:nssc-forced-ether-reception#c1]. ## Remediation Implement controls so withdrawals can only be triggered by authorized parties or according to the specs of the smart contract system [5:swc-105#c4].",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "nssc-forced-ether-reception#c6",
+        "nssc-forced-ether-reception#c0",
+        "nssc-forced-ether-reception#c1",
+        "swc-105#c4"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/forced_ether_reception/README.md), licensed under the Apache License 2.0 [8:nssc-forced-ether-reception#c6].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "# not-so-smart-contracts: Contracts can be forced to receive ether [4:nssc-forced-ether-reception#c0] # not-so-smart-contracts: Contracts can be forced to receive ether In certain circunstances, contracts can be forced to receive ether without triggering any code [7:nssc-forced-ether-reception#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Remediation Implement controls so withdrawals can only be triggered by authorized parties or according to the specs of the smart contract system [5:swc-105#c4].",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 2.2,
+      "generate_ms": 1.16,
+      "injection_flags": []
+    },
+    {
+      "id": "q10",
+      "question": "Why is block.timestamp or a blockhash a weak source of on-chain randomness?",
+      "question_type": "fact_lookup",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "swc-120#c3",
+        "swc-120#c4",
+        "nssc-bad-randomness#c2",
+        "nssc-bad-randomness#c3"
+      ],
+      "gold_doc_ids": [
+        "swc-120",
+        "nssc-bad-randomness"
+      ],
+      "retrieved_chunk_ids": [
+        "swc-120#c11",
+        "swc-120#c6",
+        "swc-120#c0",
+        "swc-120#c3",
+        "swc-120#c2",
+        "swc-120#c10",
+        "swc-120#c7",
+        "nssc-bad-randomness#c2",
+        "swc-120#c5",
+        "nssc-bad-randomness#c3"
+      ],
+      "retrieved_doc_ids": [
+        "swc-120",
+        "swc-120",
+        "swc-120",
+        "swc-120",
+        "swc-120",
+        "swc-120",
+        "swc-120",
+        "nssc-bad-randomness",
+        "swc-120",
+        "nssc-bad-randomness"
+      ],
+      "answer": "# SWC-120: Weak Sources of Randomness from Chain Attributes [3:swc-120#c0] - Using external sources of randomness via oracles, and cryptographically checking the outcome of the oracle on-chain [4:swc-120#c3]. It used the blockhash, timestamp and block number to generate numbers in a range to determine winners of the lottery [10:nssc-bad-randomness#c3]. ## Relationships - [CWE-330: Use of Insufficiently Random Values](https://cwe.mitre.org/data/definitions/330.html) - EthTrust Security Levels: - [**[M] Sources of Randomness**](https://entethalliance.org/specs/ethtrust-sl/#req-2-random-enough) - [**[M] Document Special Code Use**](https://entethalliance.org/specs/ethtrust-sl/#req-2-documented) [5:swc-120#c2]",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "swc-120#c0",
+        "swc-120#c3",
+        "nssc-bad-randomness#c3",
+        "swc-120#c2"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "# SWC-120: Weak Sources of Randomness from Chain Attributes [3:swc-120#c0] - Using external sources of randomness via oracles, and cryptographically checking the outcome of the oracle on-chain [4:swc-120#c3].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "It used the blockhash, timestamp and block number to generate numbers in a range to determine winners of the lottery [10:nssc-bad-randomness#c3].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Relationships - [CWE-330: Use of Insufficiently Random Values](https://cwe.mitre.org/data/definitions/330.html) - EthTrust Security Levels: - [**[M] Sources of Randomness**](https://entethalliance.org/specs/ethtrust-sl/#req-2-random-enough) - [**[M] Document Special Code Use**](https://entethalliance.org/specs/ethtrust-sl/#req-2-documented) [5:swc-120#c2]",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 1.93,
+      "generate_ms": 2.69,
+      "injection_flags": []
+    },
+    {
+      "id": "q11",
+      "question": "What mitigation does not-so-smart-contracts give for a wrongly named constructor?",
+      "question_type": "remediation",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "nssc-wrong-constructor-name#c2",
+        "nssc-wrong-constructor-name#c3"
+      ],
+      "gold_doc_ids": [
+        "nssc-wrong-constructor-name",
+        "swc-118"
+      ],
+      "retrieved_chunk_ids": [
+        "nssc-wrong-constructor-name#c3",
+        "nssc-unprotected-function#c2",
+        "nssc-wrong-constructor-name#c4",
+        "nssc-wrong-constructor-name#c2",
+        "nssc-wrong-constructor-name#c0",
+        "nssc-wrong-constructor-name#c1",
+        "nssc-variable-shadowing#c3",
+        "nssc-reentrancy#c3",
+        "swc-118#c6",
+        "nssc-wrong-constructor-name#c5"
+      ],
+      "retrieved_doc_ids": [
+        "nssc-wrong-constructor-name",
+        "nssc-unprotected-function",
+        "nssc-wrong-constructor-name",
+        "nssc-wrong-constructor-name",
+        "nssc-wrong-constructor-name",
+        "nssc-wrong-constructor-name",
+        "nssc-variable-shadowing",
+        "nssc-reentrancy",
+        "swc-118",
+        "nssc-wrong-constructor-name"
+      ],
+      "answer": "# not-so-smart-contracts: Wrong Constructor Name A function intended to be a constructor is named incorrectly, which causes it to end up in the runtime bytecode instead of being a constructor [6:nssc-wrong-constructor-name#c1]. # not-so-smart-contracts: Wrong Constructor Name [5:nssc-wrong-constructor-name#c0] Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/wrong_constructor_name/README.md), licensed under the Apache License 2.0 [10:nssc-wrong-constructor-name#c5]. ## Mitigations - Use `constructor` instead of a named constructor [1:nssc-wrong-constructor-name#c3]",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "nssc-wrong-constructor-name#c1",
+        "nssc-wrong-constructor-name#c0",
+        "nssc-wrong-constructor-name#c5",
+        "nssc-wrong-constructor-name#c3"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "# not-so-smart-contracts: Wrong Constructor Name A function intended to be a constructor is named incorrectly, which causes it to end up in the runtime bytecode instead of being a constructor [6:nssc-wrong-constructor-name#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "# not-so-smart-contracts: Wrong Constructor Name [5:nssc-wrong-constructor-name#c0] Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/wrong_constructor_name/README.md), licensed under the Apache License 2.0 [10:nssc-wrong-constructor-name#c5].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Mitigations - Use `constructor` instead of a named constructor [1:nssc-wrong-constructor-name#c3]",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 2.01,
+      "generate_ms": 0.99,
+      "injection_flags": []
+    },
+    {
+      "id": "q12",
+      "question": "What is the risk of delegatecall to an untrusted callee?",
+      "question_type": "fact_lookup",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "swc-112#c2",
+        "swc-112#c3",
+        "swc-112#c4"
+      ],
+      "gold_doc_ids": [
+        "swc-112"
+      ],
+      "retrieved_chunk_ids": [
+        "swc-112#c0",
+        "swc-112#c1",
+        "swc-112#c6",
+        "nssc-reentrancy#c3",
+        "swc-112#c4",
+        "swc-112#c2",
+        "swc-112#c3",
+        "swc-124#c2",
+        "swc-110#c4",
+        "swc-112#c5"
+      ],
+      "retrieved_doc_ids": [
+        "swc-112",
+        "swc-112",
+        "swc-112",
+        "nssc-reentrancy",
+        "swc-112",
+        "swc-112",
+        "swc-112",
+        "swc-124",
+        "swc-110",
+        "swc-112"
+      ],
+      "answer": "# SWC-112: Delegatecall to Untrusted Callee [1:swc-112#c0] ## Remediation Use `delegatecall` with caution and make sure to never call into untrusted contracts [5:swc-112#c4]. Use `delegatecall` with caution and make sure to never call into untrusted contracts [7:swc-112#c3]. [CWE-829: Inclusion of Functionality from Untrusted Control Sphere](https://cwe.mitre.org/data/definitions/829.html) [2:swc-112#c1]",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "swc-112#c0",
+        "swc-112#c4",
+        "swc-112#c3",
+        "swc-112#c1"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "# SWC-112: Delegatecall to Untrusted Callee [1:swc-112#c0] ## Remediation Use `delegatecall` with caution and make sure to never call into untrusted contracts [5:swc-112#c4].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "Use `delegatecall` with caution and make sure to never call into untrusted contracts [7:swc-112#c3].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "[CWE-829: Inclusion of Functionality from Untrusted Control Sphere](https://cwe.mitre.org/data/definitions/829.html) [2:swc-112#c1]",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 1.69,
+      "generate_ms": 1.55,
+      "injection_flags": []
+    },
+    {
+      "id": "q13",
+      "question": "Compare the reentrancy remediations in SWC-107 and the not-so-smart-contracts re-entrancy notes.",
+      "question_type": "multi_hop",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "swc-107#c3",
+        "swc-107#c4",
+        "nssc-reentrancy#c2",
+        "nssc-reentrancy#c3"
+      ],
+      "gold_doc_ids": [
+        "swc-107",
+        "nssc-reentrancy"
+      ],
+      "retrieved_chunk_ids": [
+        "nssc-reentrancy#c4",
+        "nssc-reentrancy#c5",
+        "swc-107#c0",
+        "nssc-unprotected-function#c1",
+        "swc-130#c4",
+        "nssc-reentrancy#c3",
+        "nssc-reentrancy#c0",
+        "swc-107#c5",
+        "nssc-reentrancy#c2",
+        "swc-105#c3"
+      ],
+      "retrieved_doc_ids": [
+        "nssc-reentrancy",
+        "nssc-reentrancy",
+        "swc-107",
+        "nssc-unprotected-function",
+        "swc-130",
+        "nssc-reentrancy",
+        "nssc-reentrancy",
+        "swc-107",
+        "nssc-reentrancy",
+        "swc-105"
+      ],
+      "answer": "Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/reentrancy/README.md), licensed under the Apache License 2.0 [2:nssc-reentrancy#c5]. # not-so-smart-contracts: Re-entrancy [7:nssc-reentrancy#c0] # not-so-smart-contracts: Unprotected function Missing (or incorrectly used) modifier on a function allows an attacker to use sensitive functionality in the contract [4:nssc-unprotected-function#c1]. ## References - [Ethereum Smart Contract Best Practices - Reentrancy](https://consensys.github.io/smart-contract-best-practices/attacks/reentrancy/) [8:swc-107#c5]",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "nssc-reentrancy#c5",
+        "nssc-reentrancy#c0",
+        "nssc-unprotected-function#c1",
+        "swc-107#c5"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/reentrancy/README.md), licensed under the Apache License 2.0 [2:nssc-reentrancy#c5].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "# not-so-smart-contracts: Re-entrancy [7:nssc-reentrancy#c0] # not-so-smart-contracts: Unprotected function Missing (or incorrectly used) modifier on a function allows an attacker to use sensitive functionality in the contract [4:nssc-unprotected-function#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## References - [Ethereum Smart Contract Best Practices - Reentrancy](https://consensys.github.io/smart-contract-best-practices/attacks/reentrancy/) [8:swc-107#c5]",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 2.14,
+      "generate_ms": 1.18,
+      "injection_flags": []
+    },
+    {
+      "id": "q14",
+      "question": "What mitigation does not-so-smart-contracts recommend for unprotected functions?",
+      "question_type": "remediation",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "nssc-unprotected-function#c2",
+        "nssc-unprotected-function#c3"
+      ],
+      "gold_doc_ids": [
+        "nssc-unprotected-function"
+      ],
+      "retrieved_chunk_ids": [
+        "nssc-unprotected-function#c2",
+        "nssc-unprotected-function#c0",
+        "nssc-unprotected-function#c1",
+        "nssc-race-condition#c3",
+        "nssc-unchecked-external-call#c3",
+        "nssc-variable-shadowing#c2",
+        "nssc-reentrancy#c3",
+        "nssc-reentrancy#c4",
+        "nssc-wrong-constructor-name#c2",
+        "nssc-unprotected-function#c5"
+      ],
+      "retrieved_doc_ids": [
+        "nssc-unprotected-function",
+        "nssc-unprotected-function",
+        "nssc-unprotected-function",
+        "nssc-race-condition",
+        "nssc-unchecked-external-call",
+        "nssc-variable-shadowing",
+        "nssc-reentrancy",
+        "nssc-reentrancy",
+        "nssc-wrong-constructor-name",
+        "nssc-unprotected-function"
+      ],
+      "answer": "# not-so-smart-contracts: Unprotected function [2:nssc-unprotected-function#c0] # not-so-smart-contracts: Unprotected function Missing (or incorrectly used) modifier on a function allows an attacker to use sensitive functionality in the contract [3:nssc-unprotected-function#c1]. Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/unprotected_function/README.md), licensed under the Apache License 2.0 [10:nssc-unprotected-function#c5]. ## Attack Scenario A contract with a `changeOwner` function does not label it as `private` and therefore allows anyone to become the contract owner [1:nssc-unprotected-function#c2].",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "nssc-unprotected-function#c0",
+        "nssc-unprotected-function#c1",
+        "nssc-unprotected-function#c5",
+        "nssc-unprotected-function#c2"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "# not-so-smart-contracts: Unprotected function [2:nssc-unprotected-function#c0] # not-so-smart-contracts: Unprotected function Missing (or incorrectly used) modifier on a function allows an attacker to use sensitive functionality in the contract [3:nssc-unprotected-function#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/unprotected_function/README.md), licensed under the Apache License 2.0 [10:nssc-unprotected-function#c5].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Attack Scenario A contract with a `changeOwner` function does not label it as `private` and therefore allows anyone to become the contract owner [1:nssc-unprotected-function#c2].",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 1.8,
+      "generate_ms": 1.09,
+      "injection_flags": []
+    },
+    {
+      "id": "q15",
+      "question": "What ERC-20-related mitigation is mentioned for race conditions in not-so-smart-contracts?",
+      "question_type": "remediation",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "nssc-race-condition#c2",
+        "nssc-race-condition#c3"
+      ],
+      "gold_doc_ids": [
+        "nssc-race-condition",
+        "swc-114"
+      ],
+      "retrieved_chunk_ids": [
+        "nssc-race-condition#c3",
+        "nssc-race-condition#c4",
+        "nssc-race-condition#c0",
+        "nssc-unprotected-function#c2",
+        "nssc-denial-of-service#c3",
+        "nssc-forced-ether-reception#c3",
+        "nssc-race-condition#c5",
+        "nssc-incorrect-interface#c2",
+        "nssc-denial-of-service#c2",
+        "nssc-unchecked-external-call#c2"
+      ],
+      "retrieved_doc_ids": [
+        "nssc-race-condition",
+        "nssc-race-condition",
+        "nssc-race-condition",
+        "nssc-unprotected-function",
+        "nssc-denial-of-service",
+        "nssc-forced-ether-reception",
+        "nssc-race-condition",
+        "nssc-incorrect-interface",
+        "nssc-denial-of-service",
+        "nssc-unchecked-external-call"
+      ],
+      "answer": "# not-so-smart-contracts: Race Condition [3:nssc-race-condition#c0] Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/race_condition/README.md), licensed under the Apache License 2.0 [7:nssc-race-condition#c5]. ## Mitigations - For the ERC20 bug, insist that Alice only be able to `approve` Bob when he is approved for 0 tokens [1:nssc-race-condition#c3]. ## Examples - [Race condition](RaceCondition.sol) outlined in the first bullet point above [2:nssc-race-condition#c4]",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "nssc-race-condition#c0",
+        "nssc-race-condition#c5",
+        "nssc-race-condition#c3",
+        "nssc-race-condition#c4"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "# not-so-smart-contracts: Race Condition [3:nssc-race-condition#c0] Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/race_condition/README.md), licensed under the Apache License 2.0 [7:nssc-race-condition#c5].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Mitigations - For the ERC20 bug, insist that Alice only be able to `approve` Bob when he is approved for 0 tokens [1:nssc-race-condition#c3].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Examples - [Race condition](RaceCondition.sol) outlined in the first bullet point above [2:nssc-race-condition#c4]",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 2.03,
+      "generate_ms": 1.54,
+      "injection_flags": []
+    },
+    {
+      "id": "q16",
+      "question": "What weakness is classified as SWC-117?",
+      "question_type": "fact_lookup",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "swc-117#c2",
+        "swc-117#c3",
+        "swc-117#c4"
+      ],
+      "gold_doc_ids": [
+        "swc-117"
+      ],
+      "retrieved_chunk_ids": [
+        "swc-117#c0",
+        "swc-129#c3",
+        "swc-117#c1",
+        "swc-117#c5",
+        "swc-124#c1",
+        "swc-129#c4",
+        "swc-107#c4",
+        "swc-117#c4",
+        "swc-124#c2",
+        "swc-116#c5"
+      ],
+      "retrieved_doc_ids": [
+        "swc-117",
+        "swc-129",
+        "swc-117",
+        "swc-117",
+        "swc-124",
+        "swc-129",
+        "swc-107",
+        "swc-117",
+        "swc-124",
+        "swc-116"
+      ],
+      "answer": "# SWC-117: Signature Malleability [1:swc-117#c0] The weakness can be avoided by performing pre-condition checks on any math operation or using a vetted library for arithmetic calculations such as SafeMath developed by OpenZeppelin [2:swc-129#c3]. ## Remediation The weakness can be avoided by performing pre-condition checks on any math operation or using a vetted library for arithmetic calculations such as SafeMath developed by OpenZeppelin [6:swc-129#c4]. ## Remediation The best practices to avoid Reentrancy weaknesses are: - Make sure all internal state changes are performed before the call is executed [7:swc-107#c4].",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "swc-117#c0",
+        "swc-129#c3",
+        "swc-129#c4",
+        "swc-107#c4"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "# SWC-117: Signature Malleability [1:swc-117#c0] The weakness can be avoided by performing pre-condition checks on any math operation or using a vetted library for arithmetic calculations such as SafeMath developed by OpenZeppelin [2:swc-129#c3].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Remediation The weakness can be avoided by performing pre-condition checks on any math operation or using a vetted library for arithmetic calculations such as SafeMath developed by OpenZeppelin [6:swc-129#c4].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "## Remediation The best practices to avoid Reentrancy weaknesses are: - Make sure all internal state changes are performed before the call is executed [7:swc-107#c4].",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 2.73,
+      "generate_ms": 1.23,
+      "injection_flags": []
+    },
+    {
+      "id": "q17",
+      "question": "According to not-so-smart-contracts, what should be done about variable shadowing?",
+      "question_type": "remediation",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "nssc-variable-shadowing#c0",
+        "nssc-variable-shadowing#c1",
+        "nssc-variable-shadowing#c2",
+        "swc-119#c3",
+        "swc-119#c4"
+      ],
+      "gold_doc_ids": [
+        "nssc-variable-shadowing",
+        "swc-119"
+      ],
+      "retrieved_chunk_ids": [
+        "nssc-variable-shadowing#c3",
+        "nssc-variable-shadowing#c0",
+        "swc-130#c5",
+        "nssc-forced-ether-reception#c0",
+        "swc-105#c4",
+        "nssc-variable-shadowing#c2",
+        "nssc-reentrancy#c3",
+        "nssc-forced-ether-reception#c1",
+        "nssc-variable-shadowing#c4",
+        "nssc-variable-shadowing#c1"
+      ],
+      "retrieved_doc_ids": [
+        "nssc-variable-shadowing",
+        "nssc-variable-shadowing",
+        "swc-130",
+        "nssc-forced-ether-reception",
+        "swc-105",
+        "nssc-variable-shadowing",
+        "nssc-reentrancy",
+        "nssc-forced-ether-reception",
+        "nssc-variable-shadowing",
+        "nssc-variable-shadowing"
+      ],
+      "answer": "# not-so-smart-contracts: Variable Shadowing [2:nssc-variable-shadowing#c0] Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/variable%20shadowing/README.md), licensed under the Apache License 2.0 [9:nssc-variable-shadowing#c4]. # not-so-smart-contracts: Variable Shadowing Variable shadowing occurs when a variable declared within a certain scope (decision block, method, or inner class) has the same name as a variable declared in an outer scope [10:nssc-variable-shadowing#c1]. # not-so-smart-contracts: Contracts can be forced to receive ether [4:nssc-forced-ether-reception#c0]",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "nssc-variable-shadowing#c0",
+        "nssc-variable-shadowing#c4",
+        "nssc-variable-shadowing#c1",
+        "nssc-forced-ether-reception#c0"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "# not-so-smart-contracts: Variable Shadowing [2:nssc-variable-shadowing#c0] Adapted from not-so-smart-contracts (Trail of Bits / crytic) (https://github.com/crytic/not-so-smart-contracts/blob/020dbdbde3e0c2e8de5f3944e7455e438b0995d5/variable%20shadowing/README.md), licensed under the Apache License 2.0 [9:nssc-variable-shadowing#c4].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "# not-so-smart-contracts: Variable Shadowing Variable shadowing occurs when a variable declared within a certain scope (decision block, method, or inner class) has the same name as a variable declared in an outer scope [10:nssc-variable-shadowing#c1].",
+          "ok": true,
+          "reason": "ok"
+        },
+        {
+          "claim": "# not-so-smart-contracts: Contracts can be forced to receive ether [4:nssc-forced-ether-reception#c0]",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 1.82,
+      "generate_ms": 1.13,
+      "injection_flags": []
+    },
+    {
+      "id": "q18",
+      "question": "What is SWC-128 about?",
+      "question_type": "fact_lookup",
+      "must_refuse": false,
+      "gold_chunk_ids": [
+        "swc-128#c2",
+        "swc-128#c3",
+        "swc-128#c4"
+      ],
+      "gold_doc_ids": [
+        "swc-128",
+        "nssc-denial-of-service"
+      ],
+      "retrieved_chunk_ids": [
+        "swc-128#c0",
+        "swc-124#c1",
+        "swc-108#c2",
+        "swc-108#c3",
+        "swc-124#c2",
+        "swc-128#c1",
+        "swc-128#c4",
+        "swc-114#c4",
+        "swc-126#c5",
+        "swc-119#c5"
+      ],
+      "retrieved_doc_ids": [
+        "swc-128",
+        "swc-124",
+        "swc-108",
+        "swc-108",
+        "swc-124",
+        "swc-128",
+        "swc-128",
+        "swc-114",
+        "swc-126",
+        "swc-119"
+      ],
+      "answer": "# SWC-128: DoS With Block Gas Limit [1:swc-128#c0]",
+      "did_refuse": false,
+      "generator": "extractive",
+      "used_chunk_ids": [
+        "swc-128#c0"
+      ],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [
+        {
+          "claim": "# SWC-128: DoS With Block Gas Limit [1:swc-128#c0]",
+          "ok": true,
+          "reason": "ok"
+        }
+      ],
+      "retrieve_ms": 1.4,
+      "generate_ms": 1.37,
+      "injection_flags": []
+    },
+    {
+      "id": "q19",
+      "question": "What high-severity findings were reported in a 2024 Uniswap audit contest on Code4rena?",
+      "question_type": "not_in_corpus",
+      "must_refuse": true,
+      "gold_chunk_ids": [],
+      "gold_doc_ids": [],
+      "retrieved_chunk_ids": [
+        "nssc-integer-overflow#c4",
+        "nssc-unprotected-function#c4",
+        "nssc-integer-overflow#c3",
+        "swc-136#c3",
+        "swc-120#c3",
+        "nssc-honeypots#c0",
+        "swc-114#c2",
+        "swc-106#c10",
+        "swc-124#c5",
+        "swc-117#c2"
+      ],
+      "retrieved_doc_ids": [
+        "nssc-integer-overflow",
+        "nssc-unprotected-function",
+        "nssc-integer-overflow",
+        "swc-136",
+        "swc-120",
+        "nssc-honeypots",
+        "swc-114",
+        "swc-106",
+        "swc-124",
+        "swc-117"
+      ],
+      "answer": "I don't have enough evidence in the retrieved documents to answer that. The knowledge base does not appear to contain this information.",
+      "did_refuse": true,
+      "generator": "extractive",
+      "used_chunk_ids": [],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [],
+      "retrieve_ms": 2.12,
+      "generate_ms": 3.97,
+      "injection_flags": []
+    },
+    {
+      "id": "q20",
+      "question": "What was the exact dollar loss and root-cause function name in the 2016 DAO hack as stated in a professional Trail of Bits client audit report in this corpus?",
+      "question_type": "not_in_corpus",
+      "must_refuse": true,
+      "gold_chunk_ids": [],
+      "gold_doc_ids": [],
+      "retrieved_chunk_ids": [
+        "nssc-wrong-constructor-name#c2",
+        "nssc-wrong-constructor-name#c1",
+        "nssc-reentrancy#c4",
+        "nssc-reentrancy#c3",
+        "swc-118#c3",
+        "nssc-wrong-constructor-name#c0",
+        "nssc-unprotected-function#c5",
+        "nssc-wrong-constructor-name#c5",
+        "nssc-unchecked-external-call#c1",
+        "nssc-reentrancy#c5"
+      ],
+      "retrieved_doc_ids": [
+        "nssc-wrong-constructor-name",
+        "nssc-wrong-constructor-name",
+        "nssc-reentrancy",
+        "nssc-reentrancy",
+        "swc-118",
+        "nssc-wrong-constructor-name",
+        "nssc-unprotected-function",
+        "nssc-wrong-constructor-name",
+        "nssc-unchecked-external-call",
+        "nssc-reentrancy"
+      ],
+      "answer": "I don't have enough evidence in the retrieved documents to answer that. The knowledge base does not appear to contain this information.",
+      "did_refuse": true,
+      "generator": "extractive",
+      "used_chunk_ids": [],
+      "citation_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "citation_detail": [],
+      "retrieve_ms": 3.18,
+      "generate_ms": 1.95,
+      "injection_flags": []
+    }
+  ]
+}

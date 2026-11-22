@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "audit-rag-assistant"
 version = "0.1.0"
-description = "Cited RAG assistant over a license-cleared smart-contract audit knowledge base (Milestone 1)."
+description = "Cited RAG assistant over a license-cleared smart-contract audit knowledge base (Milestone 2)."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE"]
