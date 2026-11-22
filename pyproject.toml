@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "audit-rag-assistant"
 version = "0.1.0"
-description = "Cited RAG assistant over a license-cleared smart-contract audit knowledge base (Milestone 2)."
+description = "Cited RAG assistant over a license-cleared smart-contract audit knowledge base."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE"]
@@ -19,6 +19,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 local = ["flashrank>=0.2.0"]
+web = ["fastapi>=0.110", "uvicorn[standard]>=0.27"]
 
 [project.scripts]
 audit-rag = "audit_rag.cli:main"

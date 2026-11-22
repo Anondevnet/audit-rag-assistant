@@ -2,7 +2,7 @@
 
 ## Status
 
-Milestone 2 of 3, as of 22 November 2026 (America/Detroit). Retrieval, cited extractive generation, injection guards, eval harness, static dashboard, and a local demo GIF are in the repo. There is no public deploy. Metrics in README Results come from `evals/reports/latest.json` (hashing + token rerank + extractive).
+Milestone 3 retrieval pass, 22 November 2026 (America/Detroit). Default retriever is still hashing + token + extractive, but short heading chunks are merged, queries are expanded, and the token reranker no longer over-rewards title stubs. A FastAPI + Dockerfile + render.yaml + fly.toml demo is in the repo; a public URL is only published when a free-tier CLI is already authenticated. Metrics in README Results compare `evals/reports/m2-baseline.json` to `evals/reports/latest.json`.
 
 ## What Milestone 1 delivered
 

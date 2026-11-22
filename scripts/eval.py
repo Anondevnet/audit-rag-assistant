@@ -14,8 +14,10 @@ def main() -> int:
     parser.add_argument("--k", type=int, default=10)
     parser.add_argument("--no-rebuild", action="store_true")
     parser.add_argument("--tag", default="latest", help="Output tag (latest writes latest.json).")
+    parser.add_argument("--index", default=None, help="Index sqlite path.")
     args = parser.parse_args()
-    report = run_harness(k=args.k, rebuild=not args.no_rebuild, tag=args.tag)
+    from pathlib import Path
+    report = run_harness(k=args.k, rebuild=not args.no_rebuild, tag=args.tag, index_path=Path(args.index) if args.index else None)
     metrics = report["metrics"]
     print(json.dumps(metrics, indent=2))
     outputs = report.get("_outputs", {})

@@ -116,6 +116,10 @@ class IndexStore:
         row = self.conn.execute("SELECT value FROM meta WHERE key = ?", (key,)).fetchone()
         return row["value"] if row else default
 
+    def document_titles(self) -> dict[str, str]:
+        rows = self.conn.execute("SELECT doc_id, title FROM documents").fetchall()
+        return {row["doc_id"]: row["title"] for row in rows}
+
     @property
     def dim(self) -> int:
         value = self.get_meta("embedding_dim")

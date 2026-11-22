@@ -7,6 +7,13 @@ from abc import ABC, abstractmethod
 
 from audit_rag.index.store import SearchHit
 
+_CONTENT_SECTIONS = (
+    "description", "remediation", "mitigation", "attack", "vulnerability",
+)
+_LOW_PRIORITY_SECTIONS = (
+    "source notice", "references", "samples", "example files", "relationships",
+)
+
 
 class Reranker(ABC):
     kind: str
@@ -39,9 +46,15 @@ class TokenOverlapReranker(Reranker):
         for hit in hits:
             doc_terms = _terms(hit.title + " " + hit.section + " " + hit.text)
             overlap = len(q_terms & set(doc_terms))
-            # mild length normalization so short exact sections can rise
-            denom = math.sqrt(len(doc_terms) or 1)
+            # Floor the length so 5-token title stubs cannot dominate
+            # longer description or remediation sections.
+            denom = math.sqrt(max(len(doc_terms), 25))
             score = overlap / denom
+            section = (hit.section or "").lower()
+            if any(name in section for name in _CONTENT_SECTIONS):
+                score *= 1.12
+            if any(name in section for name in _LOW_PRIORITY_SECTIONS):
+                score *= 0.85
             hit.rerank_score = score
             scored.append((score, hit))
         scored.sort(key=lambda item: item[0], reverse=True)
@@ -51,9 +64,10 @@ class TokenOverlapReranker(Reranker):
 class FlashRankReranker(Reranker):
     kind = "flashrank"
 
-    def __init__(self, model_name: str = "ms-marco-MiniLM-L-12-v2") -> None:
+    def __init__(self, model_name: str | None = None) -> None:
         from flashrank import Ranker
 
+        model_name = model_name or os.environ.get("FLASHRANK_MODEL") or "ms-marco-MiniLM-L-12-v2"
         cache_dir = os.environ.get("FLASHRANK_CACHE_DIR")
         kwargs = {"model_name": model_name}
         if cache_dir:

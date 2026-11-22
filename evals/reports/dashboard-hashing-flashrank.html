@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>audit-rag-assistant eval dashboard</title>
+  <style>
+    body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 2rem; color: #111; background: #fff; }
+    h1, h2 { font-weight: 600; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #ddd; padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background: #f4f4f4; }
+    tr.bad { background: #fff4f0; }
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.8rem; }
+    .metric { border: 1px solid #ddd; padding: 0.8rem; border-radius: 8px; }
+    .metric strong { display: block; font-size: 1.3rem; }
+    pre { white-space: pre-wrap; background: #f7f7f7; padding: 0.6rem; }
+    .note { color: #444; max-width: 70ch; }
+  </style>
+</head>
+<body>
+  <h1>audit-rag-assistant eval dashboard</h1>
+  <p class="note">Embedder: hashing. Generator: extractive.
+  Metrics are lexical and reproducible; they are not an LLM-as-judge score.</p>
+  <div class="metrics">
+    <div class="metric"><span>Recall@10 (all gold)</span><strong>61.1%</strong></div>
+    <div class="metric"><span>Mean recall@10</span><strong>81.5%</strong></div>
+    <div class="metric"><span>MRR@10</span><strong>0.707</strong></div>
+    <div class="metric"><span>Doc recall@10</span><strong>100.0%</strong></div>
+    <div class="metric"><span>Recall@5 (all gold)</span><strong>50.0%</strong></div>
+    <div class="metric"><span>Mean recall@5</span><strong>71.8%</strong></div>
+    <div class="metric"><span>Harness time</span><strong>56625 ms</strong></div>
+    <div class="metric"><span>Citation accuracy</span><strong>100.0%</strong></div>
+    <div class="metric"><span>Faithfulness (lexical)</span><strong>100.0%</strong></div>
+    <div class="metric"><span>Refusal accuracy</span><strong>95.0%</strong></div>
+  </div>
+  <h2>Per-question results</h2>
+  <table>
+    <thead><tr><th>ID</th><th>Question</th><th>Expected</th><th>System</th><th>Cite</th><th>Faith</th><th>Refusal</th></tr></thead>
+    <tbody>
+      <tr class='bad'><td>q01</td><td>What is a reentrancy attack, and what remediations does the SWC Registry recommend?</td><td>must answer</td><td>refuse</td><td>1.00</td><td>1.00</td><td>fail</td></tr><tr class='ok'><td>q02</td><td>How does the not-so-smart-contracts re-entrancy write-up describe the vulnerable withdraw pattern?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q03</td><td>Why can omitting a Solidity function visibility specifier be a security issue?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q04</td><td>What is an integer overflow or underflow in the sense used by SWC-101?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q05</td><td>Why is authorization through tx.origin considered unsafe?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q06</td><td>What problem does a floating pragma introduce according to SWC-103?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q07</td><td>What can go wrong if a low-level call&#x27;s return value is not checked?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q08</td><td>What is an unprotected Ether withdrawal?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q09</td><td>According to not-so-smart-contracts, can a contract block forced Ether reception, and what should authors do instead?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q10</td><td>Why is block.timestamp or a blockhash a weak source of on-chain randomness?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q11</td><td>What mitigation does not-so-smart-contracts give for a wrongly named constructor?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q12</td><td>What is the risk of delegatecall to an untrusted callee?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q13</td><td>Compare the reentrancy remediations in SWC-107 and the not-so-smart-contracts re-entrancy notes.</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q14</td><td>What mitigation does not-so-smart-contracts recommend for unprotected functions?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q15</td><td>What ERC-20-related mitigation is mentioned for race conditions in not-so-smart-contracts?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q16</td><td>What weakness is classified as SWC-117?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q17</td><td>According to not-so-smart-contracts, what should be done about variable shadowing?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q18</td><td>What is SWC-128 about?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q19</td><td>What high-severity findings were reported in a 2024 Uniswap audit contest on Code4rena?</td><td>must refuse</td><td>refuse</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q20</td><td>What was the exact dollar loss and root-cause function name in the 2016 DAO hack as stated in a professional Trail of Bits client audit repo</td><td>must refuse</td><td>refuse</td><td>1.00</td><td>1.00</td><td>pass</td></tr>
+    </tbody>
+  </table>
+  <h2>Failures</h2>
+  <ul><li><strong>q01</strong> What is a reentrancy attack, and what remediations does the SWC Registry recommend?<pre>I don&#x27;t have enough evidence in the retrieved documents to answer that. The knowledge base does not appear to contain this information.</pre></li></ul>
+  <h2>Method notes</h2>
+  <ul>
+    <li>Recall@k (all gold): Fraction of answerable questions where every gold chunk_id appears in the top k retrieved chunks.</li>
+    <li>Mean recall@k: Macro-average of |gold ∩ retrieved@k| / |gold| on answerable questions.</li>
+    <li>MRR: Mean reciprocal rank of the first gold chunk in the retrieved list, on answerable questions.</li>
+    <li>Citation accuracy: On non-refusal answers, each claim sentence must have a [rank:chunk_id] marker, the chunk must be in the retrieved set, and at least half of the claim&#x27;s content tokens (min 3, or all if fewer) must appear in the cited chunk. Refusals with no citations score 1.0.</li>
+    <li>Faithfulness: Same lexical support test as citation accuracy. This is not an LLM-as-judge score and can miss valid paraphrases.</li>
+    <li>Refusal accuracy: (true refusals + true answers) / N, using must_refuse from the golden set.</li>
+    <li>Refusal rule: The extractive generator also refuses when a proper-noun or identifier token from the question is missing from the retrieved chunks, or when a question asks for an exact dollar/amount loss and the candidate answer has no currency figure. This is lexical, not an LLM judge.</li>
+  </ul>
+</body>
+</html>

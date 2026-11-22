@@ -25,7 +25,7 @@ The description talks about reentrancy in some detail so the section is kept.
 
 Use the checks-effects-interactions pattern and a reentrancy lock.
 """
-    chunks = chunk_document(text, doc_id="demo", max_tokens=700, overlap_tokens=0)
+    chunks = chunk_document(text, doc_id="demo", max_tokens=700, overlap_tokens=0, min_tokens=0)
     assert len(chunks) >= 2
     sections = {c.section for c in chunks}
     assert "Description" in sections

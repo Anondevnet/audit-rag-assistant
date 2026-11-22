@@ -10,7 +10,8 @@ HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
 FENCE_RE = re.compile(r"(^```.*?\n.*?^```\s*$)", re.MULTILINE | re.DOTALL)
 
 DEFAULT_MAX_TOKENS = 700
-DEFAULT_OVERLAP_TOKENS = 100
+DEFAULT_OVERLAP_TOKENS = 80
+DEFAULT_MIN_TOKENS = 15
 
 
 def estimate_tokens(text: str) -> int:
@@ -53,6 +54,7 @@ def chunk_document(
     doc_id: str,
     max_tokens: int = DEFAULT_MAX_TOKENS,
     overlap_tokens: int = DEFAULT_OVERLAP_TOKENS,
+    min_tokens: int = DEFAULT_MIN_TOKENS,
     metadata: dict[str, str] | None = None,
 ) -> list[Chunk]:
     if max_tokens <= 0:
@@ -67,6 +69,7 @@ def chunk_document(
     raw_parts: list[tuple[str, str]] = []
     for heading, content in sections:
         raw_parts.extend((heading, piece) for piece in _split_long(content, max_tokens))
+    raw_parts = _merge_short_parts(raw_parts, min_tokens)
 
     merged = _apply_overlap(raw_parts, max_tokens, overlap_tokens)
     chunks: list[Chunk] = []
@@ -200,3 +203,37 @@ def _apply_overlap(
         result.append((heading, text))
         previous_words = words
     return result
+
+
+def _merge_short_parts(
+    parts: list[tuple[str, str]],
+    min_tokens: int,
+) -> list[tuple[str, str]]:
+    """Fold heading-only or tiny sections into the next (or previous) part.
+
+    Short title stubs otherwise dominate BM25 because FTS length-normalizes
+    toward brief documents that repeat the query terms.
+    """
+    if not parts or min_tokens <= 0:
+        return parts
+    pending = list(parts)
+    out: list[tuple[str, str]] = []
+    i = 0
+    while i < len(pending):
+        heading, text = pending[i]
+        if estimate_tokens(text) < min_tokens and i + 1 < len(pending):
+            next_heading, next_text = pending[i + 1]
+            pending[i + 1] = (
+                next_heading or heading,
+                (text.rstrip() + "\n\n" + next_text.lstrip()).strip(),
+            )
+            i += 1
+            continue
+        out.append((heading, text))
+        i += 1
+    if len(out) >= 2 and estimate_tokens(out[-1][1]) < min_tokens:
+        heading, text = out[-2]
+        last_heading, last_text = out[-1]
+        out[-2] = (heading or last_heading, (text.rstrip() + "\n\n" + last_text.lstrip()).strip())
+        out.pop()
+    return out

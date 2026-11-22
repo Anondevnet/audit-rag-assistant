@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: audit-rag-assistant
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: AUDIT_RAG_EMBEDDER
+        value: hashing
+      - key: AUDIT_RAG_RERANKER
+        value: token
+      - key: AUDIT_RAG_GENERATOR
+        value: extractive
+      - key: AUDIT_RAG_INDEX
+        value: data/indexes/audit.db

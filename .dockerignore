@@ -1,0 +1,13 @@
+.venv
+.git
+.github
+.flashrank_cache
+.cache
+data/indexes
+**/__pycache__
+**/*.pyc
+**/*.db
+**/*.db-wal
+**/*.db-shm
+.pytest_cache
+*.egg-info

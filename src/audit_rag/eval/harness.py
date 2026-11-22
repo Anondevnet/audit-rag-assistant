@@ -20,6 +20,7 @@ from audit_rag.generate.base import generate
 from audit_rag.index.store import IndexStore
 from audit_rag.ingest.loader import load_corpus
 from audit_rag.paths import project_root
+from audit_rag.rerank.base import get_reranker
 from audit_rag.retrieve.hybrid import hybrid_search
 
 
@@ -106,7 +107,7 @@ def run_harness(
         "method": {
             "embedder": embedder.kind,
             "generator": records[0]["generator"] if records else "extractive",
-            "retriever": "hybrid BM25+sqlite-vec RRF, token rerank unless AUDIT_RAG_RERANKER is set",
+            "retriever": "hybrid BM25+sqlite-vec weighted RRF with optional query expansion; reranker from AUDIT_RAG_RERANKER",
             "recall_at_k_all": "Fraction of answerable questions where every gold chunk_id appears in the top k retrieved chunks.",
             "mean_recall_at_k": "Macro-average of |gold ∩ retrieved@k| / |gold| on answerable questions.",
             "mrr": "Mean reciprocal rank of the first gold chunk in the retrieved list, on answerable questions.",
@@ -123,6 +124,8 @@ def run_harness(
             "chunk_count": len(chunks),
             "question_count": len(records),
             "answerable_count": len(answerable),
+            "expand": True,
+            "reranker": get_reranker().kind,
         },
         "metrics": {
             "recall@5_all": round(r5.recall_at_k_all, 4),
