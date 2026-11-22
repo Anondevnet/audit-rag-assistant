@@ -2,23 +2,318 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>audit-rag-assistant eval dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0c1117">
+  <title>Eval dashboard · audit-rag-assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 2rem; color: #111; background: #fff; }
-    h1, h2 { font-weight: 600; }
-    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
-    th, td { border: 1px solid #ddd; padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
-    th { background: #f4f4f4; }
-    tr.bad { background: #fff4f0; }
-    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.8rem; }
-    .metric { border: 1px solid #ddd; padding: 0.8rem; border-radius: 8px; }
-    .metric strong { display: block; font-size: 1.3rem; }
-    pre { white-space: pre-wrap; background: #f7f7f7; padding: 0.6rem; }
-    .note { color: #444; max-width: 70ch; }
-  </style>
+:root {
+  --bg: #0c1117;
+  --bg-elev: #141b24;
+  --bg-elev-2: #1b2430;
+  --line: #2a3544;
+  --line-strong: #3a4a5c;
+  --text: #e8eef5;
+  --muted: #a8b4c2;
+  --accent: #7ee8c8;
+  --accent-ink: #06251c;
+  --accent-dim: rgba(126, 232, 200, 0.12);
+  --accent-glow: rgba(126, 232, 200, 0.22);
+  --danger: #ffb4a8;
+  --danger-ink: #3a1010;
+  --danger-bg: #2a1514;
+  --danger-line: #8a3d36;
+  --pass: #7ee8c8;
+  --fail: #ffb4a8;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  --radius: 16px;
+  --sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --max: 920px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { color-scheme: dark; }
+body {
+  font-family: var(--sans);
+  background:
+    radial-gradient(1200px 500px at 50% -80px, rgba(126, 232, 200, 0.08), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible, button:focus-visible, .chip:focus-visible, summary:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.wrap { width: min(var(--max), calc(100% - 2rem)); margin: 0 auto; }
+.site-header {
+  border-bottom: 1px solid var(--line);
+  background: rgba(12, 17, 23, 0.88);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  padding: 0.9rem 0;
+  flex-wrap: wrap;
+}
+.brand { display: flex; gap: 0.8rem; align-items: center; min-width: 0; text-decoration: none; color: inherit; }
+.brand:hover { text-decoration: none; }
+.mark {
+  width: 2.25rem; height: 2.25rem; flex: none;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--accent-dim);
+  display: grid; place-items: center;
+  color: var(--accent);
+}
+.brand-text { min-width: 0; }
+.brand-text strong { display: block; font-size: 1.02rem; font-weight: 600; letter-spacing: -0.02em; }
+.tagline { display: block; color: var(--muted); font-size: 0.86rem; margin-top: 0.05rem; }
+.nav { display: flex; align-items: center; gap: 0.4rem 0.9rem; flex-wrap: wrap; }
+.nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.92rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+}
+.nav a:hover, .nav a[aria-current="page"] { color: var(--text); background: var(--bg-elev-2); }
+.nav .gh {
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 0.35rem 0.75rem;
+}
+.nav .gh:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+main { flex: 1; padding: 1.6rem 0 2.5rem; }
+.hero { text-align: center; margin: 0.4rem 0 1.4rem; }
+.hero h1 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 650; letter-spacing: -0.03em; margin: 0 0 0.4rem; }
+.hero p { margin: 0 auto; max-width: 46rem; color: var(--muted); }
+.ask-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+}
+.ask-card textarea {
+  width: 100%;
+  min-height: 6.2rem;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  padding: 0.85rem 0.95rem;
+}
+.ask-card textarea::placeholder { color: #7d8b9a; }
+.ask-row { display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: center; margin-top: 0.8rem; }
+button.primary {
+  appearance: none;
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-weight: 600;
+  padding: 0.6rem 1.1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  min-height: 44px;
+}
+button.primary:hover { filter: brightness(1.06); }
+button.primary:disabled { opacity: 0.65; cursor: wait; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.chip {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  min-height: 40px;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.results { margin-top: 1.25rem; }
+.meta-row { color: var(--muted); font-size: 0.88rem; margin: 0 0 0.7rem; }
+.answer-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.05rem 1.15rem;
+  box-shadow: var(--shadow);
+}
+.answer-card.refuse {
+  background: var(--danger-bg);
+  border-color: var(--danger-line);
+}
+.answer-kicker {
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 0.45rem;
+}
+.answer-card.refuse .answer-kicker { color: var(--danger); }
+.answer-body { font-size: 1.02rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.cite-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.28rem;
+  margin: 0 0.12rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.cite-chip:hover { background: rgba(126, 232, 200, 0.22); text-decoration: none; }
+.cite-chip .cite-id { font-weight: 500; color: var(--text); opacity: 0.9; }
+.sources { margin-top: 1.4rem; }
+.sources h2 { font-size: 1rem; font-weight: 600; margin: 0 0 0.7rem; letter-spacing: -0.02em; }
+.source {
+  border: 1px solid var(--line);
+  background: var(--bg-elev);
+  border-radius: 12px;
+  margin: 0 0 0.55rem;
+  padding: 0;
+}
+.source[open] { border-color: var(--line-strong); }
+.source summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.7rem;
+  align-items: center;
+  padding: 0.75rem 0.9rem;
+}
+.source summary::-webkit-details-marker { display: none; }
+.source .passage { margin: 0; padding: 0 0.9rem 0.9rem; color: var(--text); white-space: pre-wrap; overflow-wrap: anywhere; }
+.source .src-links { padding: 0 0.9rem 0.9rem; font-size: 0.88rem; }
+.license {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+  color: var(--muted);
+}
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--muted);
+  padding: 0.8rem 0;
+}
+.spinner {
+  width: 1.05rem; height: 1.05rem;
+  border: 2px solid var(--line-strong);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; border-top-color: var(--line-strong); }
+  html { scroll-behavior: auto; }
+}
+.error { color: var(--danger); }
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0 1.4rem;
+}
+.metric {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.85rem 0.95rem;
+}
+.metric span { display: block; color: var(--muted); font-size: 0.8rem; }
+.metric strong { display: block; font-size: 1.35rem; margin-top: 0.25rem; letter-spacing: -0.03em; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { padding: 0.55rem 0.7rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+th { background: var(--bg-elev-2); font-weight: 600; color: var(--muted); font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; }
+tr.bad { background: var(--danger-bg); }
+tr:last-child td { border-bottom: 0; }
+.pill { display: inline-block; border-radius: 999px; padding: 0.08rem 0.5rem; font-size: 0.78rem; font-weight: 600; }
+.pill.pass { background: var(--accent-dim); color: var(--accent); }
+.pill.fail { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-line); }
+.note, .method-notes { color: var(--muted); }
+.method-notes { max-width: 75ch; }
+.method-notes li { margin: 0.35rem 0; }
+.failures pre {
+  white-space: pre-wrap;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.6rem;
+  overflow-wrap: anywhere;
+}
+.site-footer {
+  border-top: 1px solid var(--line);
+  padding: 1.1rem 0 1.4rem;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+.site-footer p { margin: 0.25rem 0; }
+h1.page-title { font-size: 1.55rem; letter-spacing: -0.03em; margin: 0 0 0.4rem; }
+@media (max-width: 640px) {
+  .header-inner { padding: 0.75rem 0; }
+  .ask-card, .answer-card { padding: 0.85rem; }
+  .cite-chip .cite-id { display: none; }
+}
+</style>
 </head>
 <body>
-  <h1>audit-rag-assistant eval dashboard</h1>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">
+      <svg class="mark" viewBox="0 0 32 32" width="36" height="36" aria-hidden="true"><rect x="1.5" y="1.5" width="29" height="29" rx="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 16.5l4 4 10-10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="brand-text">
+        <strong>audit-rag-assistant</strong>
+        <span class="tagline">Cited answers over license-cleared audit knowledge</span>
+      </span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="/">Ask</a>
+      <a href="/dashboard" aria-current="page">Dashboard</a>
+      <a class="gh" href="https://github.com/Anondevnet/audit-rag-assistant" rel="noopener noreferrer">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1 class="page-title">Eval dashboard</h1>
   <p class="note">Embedder: hashing. Generator: extractive.
   Metrics are lexical and reproducible; they are not an LLM-as-judge score.</p>
   <div class="metrics">
@@ -34,16 +329,18 @@
     <div class="metric"><span>Refusal accuracy</span><strong>100.0%</strong></div>
   </div>
   <h2>Per-question results</h2>
+  <div class="table-wrap">
   <table>
     <thead><tr><th>ID</th><th>Question</th><th>Expected</th><th>System</th><th>Cite</th><th>Faith</th><th>Refusal</th></tr></thead>
     <tbody>
-      <tr class='ok'><td>q01</td><td>What is a reentrancy attack, and what remediations does the SWC Registry recommend?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q02</td><td>How does the not-so-smart-contracts re-entrancy write-up describe the vulnerable withdraw pattern?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q03</td><td>Why can omitting a Solidity function visibility specifier be a security issue?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q04</td><td>What is an integer overflow or underflow in the sense used by SWC-101?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q05</td><td>Why is authorization through tx.origin considered unsafe?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q06</td><td>What problem does a floating pragma introduce according to SWC-103?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q07</td><td>What can go wrong if a low-level call&#x27;s return value is not checked?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q08</td><td>What is an unprotected Ether withdrawal?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q09</td><td>According to not-so-smart-contracts, can a contract block forced Ether reception, and what should authors do instead?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q10</td><td>Why is block.timestamp or a blockhash a weak source of on-chain randomness?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q11</td><td>What mitigation does not-so-smart-contracts give for a wrongly named constructor?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q12</td><td>What is the risk of delegatecall to an untrusted callee?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q13</td><td>Compare the reentrancy remediations in SWC-107 and the not-so-smart-contracts re-entrancy notes.</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q14</td><td>What mitigation does not-so-smart-contracts recommend for unprotected functions?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q15</td><td>What ERC-20-related mitigation is mentioned for race conditions in not-so-smart-contracts?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q16</td><td>What weakness is classified as SWC-117?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q17</td><td>According to not-so-smart-contracts, what should be done about variable shadowing?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q18</td><td>What is SWC-128 about?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q19</td><td>What high-severity findings were reported in a 2024 Uniswap audit contest on Code4rena?</td><td>must refuse</td><td>refuse</td><td>1.00</td><td>1.00</td><td>pass</td></tr><tr class='ok'><td>q20</td><td>What was the exact dollar loss and root-cause function name in the 2016 DAO hack as stated in a professional Trail of Bits client audit repo</td><td>must refuse</td><td>refuse</td><td>1.00</td><td>1.00</td><td>pass</td></tr>
+      <tr class='ok'><td>q01</td><td>What is a reentrancy attack, and what remediations does the SWC Registry recommend?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q02</td><td>How does the not-so-smart-contracts re-entrancy write-up describe the vulnerable withdraw pattern?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q03</td><td>Why can omitting a Solidity function visibility specifier be a security issue?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q04</td><td>What is an integer overflow or underflow in the sense used by SWC-101?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q05</td><td>Why is authorization through tx.origin considered unsafe?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q06</td><td>What problem does a floating pragma introduce according to SWC-103?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q07</td><td>What can go wrong if a low-level call&#x27;s return value is not checked?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q08</td><td>What is an unprotected Ether withdrawal?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q09</td><td>According to not-so-smart-contracts, can a contract block forced Ether reception, and what should authors do instead?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q10</td><td>Why is block.timestamp or a blockhash a weak source of on-chain randomness?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q11</td><td>What mitigation does not-so-smart-contracts give for a wrongly named constructor?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q12</td><td>What is the risk of delegatecall to an untrusted callee?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q13</td><td>Compare the reentrancy remediations in SWC-107 and the not-so-smart-contracts re-entrancy notes.</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q14</td><td>What mitigation does not-so-smart-contracts recommend for unprotected functions?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q15</td><td>What ERC-20-related mitigation is mentioned for race conditions in not-so-smart-contracts?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q16</td><td>What weakness is classified as SWC-117?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q17</td><td>According to not-so-smart-contracts, what should be done about variable shadowing?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q18</td><td>What is SWC-128 about?</td><td>must answer</td><td>answer</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q19</td><td>What high-severity findings were reported in a 2024 Uniswap audit contest on Code4rena?</td><td>must refuse</td><td>refuse</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr><tr class='ok'><td>q20</td><td>What was the exact dollar loss and root-cause function name in the 2016 DAO hack as stated in a professional Trail of Bits client audit repo</td><td>must refuse</td><td>refuse</td><td>1.00</td><td>1.00</td><td><span class='pill pass'>pass</span></td></tr>
     </tbody>
   </table>
+  </div>
   <h2>Failures</h2>
-  <p>No refusal or citation failures in this run.</p>
+  <p class='note'>No refusal or citation failures in this run.</p>
   <h2>Method notes</h2>
-  <ul>
+  <ul class="method-notes">
     <li>Recall@k (all gold): Fraction of answerable questions where every gold chunk_id appears in the top k retrieved chunks.</li>
     <li>Mean recall@k: Macro-average of |gold ∩ retrieved@k| / |gold| on answerable questions.</li>
     <li>MRR: Mean reciprocal rank of the first gold chunk in the retrieved list, on answerable questions.</li>
@@ -52,5 +349,13 @@
     <li>Refusal accuracy: (true refusals + true answers) / N, using must_refuse from the golden set.</li>
     <li>Refusal rule: The extractive generator also refuses when a proper-noun or identifier token from the question is missing from the retrieved chunks, or when a question asks for an exact dollar/amount loss and the candidate answer has no currency figure. This is lexical, not an LLM judge.</li>
   </ul>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Sources: SWC Registry (MIT) and not-so-smart-contracts (Apache-2.0). This is a demo, not an audit.</p>
+    <p>Educational write-ups only. Not a substitute for a professional security review.</p>
+  </div>
+</footer>
 </body>
 </html>

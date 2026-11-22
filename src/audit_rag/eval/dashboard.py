@@ -5,6 +5,8 @@ from __future__ import annotations
 import html
 from pathlib import Path
 
+from audit_rag.theme import page_end, page_start, render_footer, render_header
+
 
 def _pct(value: float) -> str:
     return f"{value * 100:.1f}%"
@@ -20,17 +22,19 @@ def render_dashboard(report: dict, path: Path) -> None:
         ok = (rec["did_refuse"] and rec["must_refuse"]) or (
             (not rec["did_refuse"]) and (not rec["must_refuse"])
         )
+        pill = "pass" if ok else "fail"
         rows.append(
             "<tr class='{cls}'><td>{id}</td><td>{q}</td><td>{expected}</td><td>{status}</td>"
-            "<td>{cite}</td><td>{faith}</td><td>{ok}</td></tr>".format(
+            "<td>{cite}</td><td>{faith}</td><td><span class='pill {pill}'>{ok}</span></td></tr>".format(
                 cls="ok" if ok else "bad",
                 id=html.escape(str(rec["id"])),
                 q=html.escape(rec["question"][:140]),
-                expected=expected,
-                status=status,
+                expected=html.escape(expected),
+                status=html.escape(status),
                 cite=f"{rec['citation_accuracy']:.2f}",
                 faith=f"{rec['faithfulness']:.2f}",
-                ok="pass" if ok else "fail",
+                pill=pill,
+                ok=pill,
             )
         )
     failures = []
@@ -45,29 +49,20 @@ def render_dashboard(report: dict, path: Path) -> None:
                     ans=html.escape(rec["answer"][:800]),
                 )
             )
-    fail_html = "<ul>" + "".join(failures) + "</ul>" if failures else "<p>No refusal or citation failures in this run.</p>"
-    page = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>audit-rag-assistant eval dashboard</title>
-  <style>
-    body {{ font-family: ui-sans-serif, system-ui, sans-serif; margin: 2rem; color: #111; background: #fff; }}
-    h1, h2 {{ font-weight: 600; }}
-    table {{ border-collapse: collapse; width: 100%; margin: 1rem 0; }}
-    th, td {{ border: 1px solid #ddd; padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }}
-    th {{ background: #f4f4f4; }}
-    tr.bad {{ background: #fff4f0; }}
-    .metrics {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.8rem; }}
-    .metric {{ border: 1px solid #ddd; padding: 0.8rem; border-radius: 8px; }}
-    .metric strong {{ display: block; font-size: 1.3rem; }}
-    pre {{ white-space: pre-wrap; background: #f7f7f7; padding: 0.6rem; }}
-    .note {{ color: #444; max-width: 70ch; }}
-  </style>
-</head>
-<body>
-  <h1>audit-rag-assistant eval dashboard</h1>
-  <p class="note">Embedder: {html.escape(method['embedder'])}. Generator: {html.escape(report['settings'].get('k') and report['method']['generator'])}.
+    fail_html = (
+        "<ul class='failures'>" + "".join(failures) + "</ul>"
+        if failures
+        else "<p class='note'>No refusal or citation failures in this run.</p>"
+    )
+    embedder = html.escape(str(method.get("embedder", "")))
+    generator = html.escape(str(method.get("generator", "")))
+    page = (
+        page_start("Eval dashboard · audit-rag-assistant")
+        + render_header("dashboard")
+        + f"""
+<main class="wrap">
+  <h1 class="page-title">Eval dashboard</h1>
+  <p class="note">Embedder: {embedder}. Generator: {generator}.
   Metrics are lexical and reproducible; they are not an LLM-as-judge score.</p>
   <div class="metrics">
     <div class="metric"><span>Recall@10 (all gold)</span><strong>{_pct(m['recall@10_all'])}</strong></div>
@@ -82,16 +77,18 @@ def render_dashboard(report: dict, path: Path) -> None:
     <div class="metric"><span>Refusal accuracy</span><strong>{_pct(m['refusal_accuracy'])}</strong></div>
   </div>
   <h2>Per-question results</h2>
+  <div class="table-wrap">
   <table>
     <thead><tr><th>ID</th><th>Question</th><th>Expected</th><th>System</th><th>Cite</th><th>Faith</th><th>Refusal</th></tr></thead>
     <tbody>
       {''.join(rows)}
     </tbody>
   </table>
+  </div>
   <h2>Failures</h2>
   {fail_html}
   <h2>Method notes</h2>
-  <ul>
+  <ul class="method-notes">
     <li>Recall@k (all gold): {html.escape(method['recall_at_k_all'])}</li>
     <li>Mean recall@k: {html.escape(method['mean_recall_at_k'])}</li>
     <li>MRR: {html.escape(method['mrr'])}</li>
@@ -100,7 +97,9 @@ def render_dashboard(report: dict, path: Path) -> None:
     <li>Refusal accuracy: {html.escape(method['refusal_accuracy'])}</li>
     <li>Refusal rule: {html.escape(method.get('refusal_rule') or 'See README Results.')}</li>
   </ul>
-</body>
-</html>
+</main>
 """
+        + render_footer()
+        + page_end()
+    )
     path.write_text(page, encoding="utf-8")

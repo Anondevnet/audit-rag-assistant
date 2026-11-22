@@ -3,6 +3,7 @@ services:
     name: audit-rag-assistant
     runtime: docker
     plan: free
+    autoDeployTrigger: commit
     healthCheckPath: /health
     envVars:
       - key: AUDIT_RAG_EMBEDDER
