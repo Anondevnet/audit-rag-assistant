@@ -1,14 +1,19 @@
 # audit-rag-assistant
 
 [![CI](https://github.com/Anondevnet/audit-rag-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/Anondevnet/audit-rag-assistant/actions/workflows/ci.yml)
+[![Live demo](https://img.shields.io/badge/Live%20demo-onrender-2ea44f)](https://audit-rag-assistant.onrender.com/)
 
-**Milestone 3 work in progress.** License-cleared corpus, improved hybrid retrieval, cited extractive answers, prompt-injection guards, an eval dashboard, and a deployable FastAPI demo. A public URL is added only when a free-tier host is already authenticated.
+**Live demo:** [https://audit-rag-assistant.onrender.com/](https://audit-rag-assistant.onrender.com/) — the Render free tier may take about 50 seconds to wake.
+
+**Milestone 3 work in progress.** License-cleared corpus, improved hybrid retrieval, cited extractive answers, prompt-injection guards, an eval dashboard, and a public FastAPI demo.
 
 A cited RAG assistant over educational smart-contract weakness write-ups. You ask a question; the CLI retrieves chunks, treats them as untrusted data, and either quotes cited sentences or refuses when the evidence is insufficient.
 
 This is not a substitute for a professional audit, and the corpus is not a collection of firm audit reports.
 
 ## Demo
+
+**Live demo:** [https://audit-rag-assistant.onrender.com/](https://audit-rag-assistant.onrender.com/) (free tier may take about 50 seconds to wake).
 
 ![The audit-rag-assistant demo: dark security theme, header, centered ask box, and example-question chips](docs/screenshot.png)
 
@@ -166,7 +171,7 @@ python -m audit_rag ingest
 uvicorn audit_rag.web:app --host 0.0.0.0 --port 8000
 ```
 
-Blueprint: [`render.yaml`](render.yaml). Alternative: [`fly.toml`](fly.toml) + [`Dockerfile`](Dockerfile). A public deploy is only applied when a Render or Fly CLI is already authenticated; this repo does not create paid services.
+Live demo: [https://audit-rag-assistant.onrender.com/](https://audit-rag-assistant.onrender.com/) (Render free tier; may take about 50 seconds to wake). Blueprint: [`render.yaml`](render.yaml). Alternative: [`fly.toml`](fly.toml) + [`Dockerfile`](Dockerfile).
 
 ## Limitations
 
@@ -174,6 +179,6 @@ Blueprint: [`render.yaml`](render.yaml). Alternative: [`fly.toml`](fly.toml) + [
 - The committed metrics use the extractive generator. Citation accuracy and faithfulness are lexical overlap tests and will naturally be high for extractive copies.
 - Because short heading chunks were merged, before/after recall is a system-level comparison (468 vs 345 chunks, rematched gold IDs to the same source key points), not a frozen-ID ablation of the reranker alone.
 - SWC content is educational and no longer actively maintained upstream (2020).
-- No public demo URL is claimed until a free-tier host is actually authenticated and verified.
+- The public demo is a free-tier Render service and may take about 50 seconds to wake after idle.
 
 Code is MIT (Copyright 2026 Anondevnet). Third-party corpus text stays under its original MIT / Apache-2.0 licenses; see [NOTICE](NOTICE) and [DATA.md](DATA.md).
