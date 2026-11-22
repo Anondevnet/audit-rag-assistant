@@ -1,0 +1,36 @@
+# Local environments and secrets
+.venv/
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Indexes and caches (rebuild with the ingest CLI)
+data/indexes/*.db
+data/indexes/*.db-*
+data/caches/
+.flashrank_cache/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Any local SQLite databases and tool caches
+*.db
+*.db-wal
+*.db-shm
+.cache/

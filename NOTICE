@@ -1,0 +1,29 @@
+audit-rag-assistant
+Copyright (c) 2026 Anondevnet
+
+This product includes educational material from third-party projects.
+Those materials remain under their original licenses. Copies of the
+upstream license texts are in data/licenses/.
+
+------------------------------------------------------------------------------
+SWC Registry (MIT)
+Copyright (c) 2018-present Smart Contract Weakness Classification Registry
+Source: https://github.com/SmartContractSecurity/SWC-registry
+Commit: 1b6227074ecd180b374e4844153afdda0332f979
+
+The MIT license text is included in data/licenses/SWC-registry-LICENSE.
+Modifications in this repository: YAML front matter, heading normalization,
+and removal of the repeated upstream maintenance banner (the fact is
+retained in each document’s source notice and in DATA.md).
+
+------------------------------------------------------------------------------
+not-so-smart-contracts (Apache License 2.0)
+Copyright Trail of Bits and not-so-smart-contracts contributors
+Source: https://github.com/crytic/not-so-smart-contracts
+Commit: 020dbdbde3e0c2e8de5f3944e7455e438b0995d5
+
+The Apache License 2.0 text is included in data/licenses/not-so-smart-contracts-LICENSE.
+Modifications in this repository: YAML front matter, heading normalization,
+and an example-file index. README prose is otherwise unchanged. This
+NOTICE file, together with DATA.md and per-document front matter, is
+provided to satisfy Apache-2.0 attribution for the derived documents.
