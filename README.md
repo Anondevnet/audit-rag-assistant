@@ -1,9 +1,31 @@
 # audit-rag-assistant
 
 [![CI](https://github.com/Anondevnet/audit-rag-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/Anondevnet/audit-rag-assistant/actions/workflows/ci.yml)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live demo](https://img.shields.io/badge/Live%20demo-onrender-2ea44f)](https://audit-rag-assistant.onrender.com/)
 
-**Live demo:** [https://audit-rag-assistant.onrender.com/](https://audit-rag-assistant.onrender.com/) — the Render free tier may take about 50 seconds to wake.
+A cited RAG assistant for smart-contract security questions that answers only from license-cleared weakness write-ups, cites every sentence, and refuses when the evidence isn't there (mean recall@5 0.84, citation and refusal accuracy 1.0 on a 20-question golden set).
+
+**Live demo:** [https://audit-rag-assistant.onrender.com/](https://audit-rag-assistant.onrender.com/) (Render free tier, may take about 50 seconds to wake)
+
+![The audit-rag-assistant demo: dark security theme, header, centered ask box, and example-question chips](docs/screenshot.png)
+
+## Quickstart
+
+Offline and deterministic (the same stack CI runs), no API keys needed:
+
+```bash
+git clone https://github.com/Anondevnet/audit-rag-assistant && cd audit-rag-assistant
+python3.11 -m venv .venv && source .venv/bin/activate && pip install -e ".[dev]"
+export AUDIT_RAG_EMBEDDER=hashing AUDIT_RAG_RERANKER=token AUDIT_RAG_GENERATOR=extractive
+python -m audit_rag ingest && python -m audit_rag ask "Why is authorization through tx.origin considered unsafe?"
+pytest && python scripts/eval.py --k 10
+```
+
+Ollama embeddings, FlashRank reranking, and local chat models are covered in [Setup details](#setup-details).
+
+## Overview
 
 **Milestone 3 work in progress.** License-cleared corpus, improved hybrid retrieval, cited extractive answers, prompt-injection guards, an eval dashboard, and a public FastAPI demo.
 
@@ -14,8 +36,6 @@ This is not a substitute for a professional audit, and the corpus is not a colle
 ## Demo
 
 **Live demo:** [https://audit-rag-assistant.onrender.com/](https://audit-rag-assistant.onrender.com/) (free tier may take about 50 seconds to wake).
-
-![The audit-rag-assistant demo: dark security theme, header, centered ask box, and example-question chips](docs/screenshot.png)
 
 The FastAPI demo (`/` and `/dashboard`) uses a dark security theme. Citation chips in an answer jump to the cited passage, license, and source URL. `/dashboard` shows the eval metric cards and per-question table in the same theme.
 
@@ -107,7 +127,7 @@ flowchart TD
 
 **Not included:** Code4rena, Sherlock, or Solodit content. See [DATA.md](DATA.md) for licenses, pinned commits, and the reasons those sources were excluded.
 
-## Quickstart
+## Setup details
 
 Requires Python 3.11+.
 
