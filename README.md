@@ -35,8 +35,6 @@ This is not a substitute for a professional audit, and the corpus is not a colle
 
 ## Demo
 
-**Live demo:** [https://audit-rag-assistant.onrender.com/](https://audit-rag-assistant.onrender.com/) (free tier may take about 50 seconds to wake).
-
 The FastAPI demo (`/` and `/dashboard`) uses a dark security theme. Citation chips in an answer jump to the cited passage, license, and source URL. `/dashboard` shows the eval metric cards and per-question table in the same theme.
 
 CLI walkthrough (ingest, ask, refusal, dashboard):
